@@ -27,16 +27,34 @@ defined('MOODLE_INTERNAL') || die();
 //require(__DIR__.'/../../config.php');
 global $DB;
 
+$seal_admin = $DB->get_records('seal_admin');
+if($seal_admin[1]->enabledcreate == '1'){
+    $mensaje = 'false';
+}
+else{
+    $mensaje = 'true';
+}
+//$mensaje = var_dump($seal_admin[1]);
+
 /*if ($hassiteconfig) {
     $settings = new admin_settingpage('mod_seal_settings', new lang_string('pluginname', 'mod_seal'));
 
     // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedIf*/
 if ($ADMIN->fulltree) {
-        // TODO: Define actual plugin settings page and add it to the tree - {@link https://docs.moodle.org/dev/Admin_settings}.
-    $settings->add(new admin_setting_heading('uno', 'Iniciovacio', 'Se explica como certificarse se da posibilidad de creditos gratuitos se pide wallet con firma para recibir variables'));
-    $settings->add(new admin_setting_heading('dos', 'Habilitado para atestiguar compañia', 'formulario para atestiguar compañia'));
-    $settings->add(new admin_setting_heading('tres', 'Cree su certificado', 'Menu donde se crea el certificado para ser utilizado por los profesores y usuarios. Después de creado queda un botón para solicitar el attestation'));
-    $settings->add(new admin_setting_heading('cuatro', 'prueba acceso a base', 'var_dump($DB->seal)'));
+    if(is_null($seal_admin[1])){
+        $settings->add(new admin_setting_heading('uno', 'Iniciovacio', 'Se muestra botón para cargar wallet con firma, se explica la solución'));
+    }
+    else if ($seal_admin[1]->enabledcreate == '0'){
+        $settings->add(new admin_setting_heading('uno', 'No esta habilitado', 'Se explica como inscribirse se da posibilidad de creditos gratuitos se deja botón para modificar wallet con firma para recibir variables'));
+    }
+    else if ($seal_admin[1]->enabledattestation == '0'){
+        $settings->add(new admin_setting_heading('uno', 'Habilitado para atestiguar compañia', 'formulario para atestiguar compañia'));
+    }
+    else{
+        $settings->add(new admin_setting_heading('uno', 'Cree su certificado', 'Menu donde se crea el certificado para ser utilizado por los profesores y usuarios. Después de creado queda un botón para solicitar el attestation'));
+
+    }
+    //die;
 
     }
 //}
