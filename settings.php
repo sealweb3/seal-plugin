@@ -1,60 +1,113 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
-
-/**
- * Plugin administration pages are defined here.
- *
- * @package     mod_seal
- * @category    admin
- * @copyright   2024 Pablo Vesga <pablovesga@outlook.com>
- * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
-defined('MOODLE_INTERNAL') || die();
-//require(__DIR__.'/../../config.php');
-global $DB;
-
-$seal_admin = $DB->get_records('seal_admin');
-if($seal_admin[1]->enabledcreate == '1'){
-    $mensaje = 'false';
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
 }
-else{
+
+$PAGE->requires->js('/mod/seal/metamask.js');
+
+// Fetch records and check for matching signature
+global $DB;
+$seal_admin = $DB->get_records('seal_admin');
+$signature = optional_param('signature', '', PARAM_TEXT); // Get the signature from the request
+$matching_record = isset($_SESSION['matching_record']) ? $_SESSION['matching_record'] : null; // Get the matching record from the session
+foreach ($seal_admin as $record) {
+    if (isset($record->signaturehash) && $record->signaturehash === $signature) {
+        $matching_record = $record;
+        break;
+    }
+}
+
+if (!is_null($matching_record)) {
+    $mensaje = 'false';
+    // Use $matching_record to access the contents of the matching row
+} else {
     $mensaje = 'true';
 }
-//$mensaje = var_dump($seal_admin[1]);
 
-/*if ($hassiteconfig) {
-    $settings = new admin_settingpage('mod_seal_settings', new lang_string('pluginname', 'mod_seal'));
 
-    // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedIf*/
 if ($ADMIN->fulltree) {
-    if(is_null($seal_admin[1])){
-        $settings->add(new admin_setting_heading('uno', 'Iniciovacio', 'Se muestra botón para cargar wallet con firma, se explica la solución'));
-    }
-    else if ($seal_admin[1]->enabledcreate == '0'){
-        $settings->add(new admin_setting_heading('uno', 'No esta habilitado', 'Se explica como inscribirse se da posibilidad de creditos gratuitos se deja botón para modificar wallet con firma para recibir variables'));
-    }
-    else if ($seal_admin[1]->enabledattestation == '0'){
-        $settings->add(new admin_setting_heading('uno', 'Habilitado para atestiguar compañia', 'formulario para atestiguar compañia'));
-    }
-    else{
-        $settings->add(new admin_setting_heading('uno', 'Cree su certificado', 'Menu donde se crea el certificado para ser utilizado por los profesores y usuarios. Después de creado queda un botón para solicitar el attestation'));
+    if ($matching_record == null) {
+        $settings->add(new admin_setting_heading('uno', get_string('settings_start', 'seal'), ''));
+        $settings->add(new admin_setting_description('seal/wallet_button', '', '<button type="button" id="metamaskButton">' . get_string('wallet_button', 'seal') . '</button>'));
+    } else if ($matching_record->enabledcreate == '0') {
+        $settings->add(new admin_setting_description('seal/disconnect_button', '', '<button type="button" id="disconnectButton">Disconnect Wallet</button>'));
+        $settings->add(new admin_setting_heading('uno', get_string('settings_not_enabled', 'seal'), ''));
+    } else if ($matching_record->enabledcreate == '1' && $matching_record->enabledattestation == '1') {
+        $settings->add(new admin_setting_description('seal/disconnect_button', '', '<button type="button" id="disconnectButton">Disconnect Wallet</button>'));
+        $settings->add(new admin_setting_heading('uno', get_string('settings_attestation_enabled', 'seal'), ''));
 
-    }
-    //die;
+        // Predefined values
+        $predefined_values = array(
+            'entityname' => 'Predefined Entity Name',
+            'entitydescription' => 'Predefined Entity Description',
+            'entitytype' => 'universidad',
+            'geolocation' => 'Predefined Location',
+            'foundationyear' => 2000,
+            'contactemail' => 'contact@example.com',
+            'contactphone' => '123456789',
+            'contactaddress' => 'Predefined Address',
+            'contactwebsite' => 'https://example.com'
+        );
 
+        // Nombre de la Entidad
+        $settings->add(new admin_setting_configtext('seal/entityname', get_string('entityname', 'seal'), '', $predefined_values['entityname'], PARAM_TEXT));
+
+        // Descripción de la Entidad
+        $settings->add(new admin_setting_configtextarea('seal/entitydescription', get_string('entitydescription', 'seal'), '', $predefined_values['entitydescription'], PARAM_TEXT));
+
+        // Tipo de Entidad
+        $options = array(
+            'universidad' => get_string('university', 'seal'),
+            'organizacion' => get_string('organization', 'seal'),
+            'plataforma' => get_string('educationalplatform', 'seal')
+        );
+        $settings->add(new admin_setting_configselect('seal/entitytype', get_string('entitytype', 'seal'), '', $predefined_values['entitytype'], $options));
+
+        // Ubicación Geográfica
+        $settings->add(new admin_setting_configtext('seal/geolocation', get_string('geolocation', 'seal'), '', $predefined_values['geolocation'], PARAM_TEXT));
+
+        // Año de Fundación
+        $settings->add(new admin_setting_configtext('seal/foundationyear', get_string('foundationyear', 'seal'), '', $predefined_values['foundationyear'], PARAM_INT));
+
+        // Información de Contacto
+        $settings->add(new admin_setting_configtext('seal/contactemail', get_string('contactemail', 'seal'), '', $predefined_values['contactemail'], PARAM_EMAIL));
+        $settings->add(new admin_setting_configtext('seal/contactphone', get_string('contactphone', 'seal'), '', $predefined_values['contactphone'], PARAM_TEXT));
+        $settings->add(new admin_setting_configtext('seal/contactaddress', get_string('contactaddress', 'seal'), '', $predefined_values['contactaddress'], PARAM_TEXT));
+        $settings->add(new admin_setting_configtext('seal/contactwebsite', get_string('contactwebsite', 'seal'), '', $predefined_values['contactwebsite'], PARAM_URL));
+
+        // Include the JavaScript module
+    } else if ($matching_record->enabledcreate == '1' && $matching_record->enabledattestation == '0') {
+        $settings->add(new admin_setting_description('seal/disconnect_button', '', '<button type="button" id="disconnectButton">Disconnect Wallet</button>'));
+
+        $settings->add(new admin_setting_heading('uno', get_string('enable_certificates', 'seal'), ''));
+
+        // Nombre de la Entidad
+        $settings->add(new admin_setting_configtext('seal/entityname', get_string('entityname', 'seal'), '', '', PARAM_TEXT));
+
+        // Descripción de la Entidad
+        $settings->add(new admin_setting_configtextarea('seal/entitydescription', get_string('entitydescription', 'seal'), '', '', PARAM_TEXT));
+
+        // Tipo de Entidad
+        $options = array(
+            'university' => get_string('university', 'seal'),
+            'organization' => get_string('organization', 'seal'),
+            'educationalplatform' => get_string('educationalplatform', 'seal')
+        );
+        $settings->add(new admin_setting_configselect('seal/entitytype', get_string('entitytype', 'seal'), '', '', $options));
+
+        // Ubicación Geográfica
+        $settings->add(new admin_setting_configtext('seal/geolocation', get_string('geolocation', 'seal'), '', '', PARAM_TEXT));
+
+        // Año de Fundación
+        $settings->add(new admin_setting_configtext('seal/foundationyear', get_string('foundationyear', 'seal'), '', '', PARAM_INT));
+
+        // Logo de la Entidad
+        $settings->add(new admin_setting_configstoredfile('seal/entitylogo', get_string('entitylogo', 'seal'), get_string('entitylogodesc', 'seal'), 'entitylogo'));
+
+        // Información de Contacto
+        $settings->add(new admin_setting_configtext('seal/contactemail', get_string('contactemail', 'seal'), '', '', PARAM_EMAIL));
+        $settings->add(new admin_setting_configtext('seal/contactphone', get_string('contactphone', 'seal'), '', '', PARAM_TEXT));
+        $settings->add(new admin_setting_configtext('seal/contactaddress', get_string('contactaddress', 'seal'), '', '', PARAM_TEXT));
+        $settings->add(new admin_setting_configtext('seal/contactwebsite', get_string('contactwebsite', 'seal'), '', '', PARAM_URL));
     }
-//}
+}
