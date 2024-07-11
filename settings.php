@@ -1,15 +1,20 @@
 <?php
+require_once(__DIR__ . '/../../config.php'); // Use __DIR__ to get the directory of the current file
+require_login();
+
+// Start the session using Moodle's session manager
 if (session_status() == PHP_SESSION_NONE) {
-    session_start();
+    \core\session\manager::start();
 }
 
-$PAGE->requires->js('/mod/seal/metamask.js');
+$PAGE->requires->js(new moodle_url('/mod/seal/metamask.js'));
 
 // Fetch records and check for matching signature
 global $DB;
 $seal_admin = $DB->get_records('seal_admin');
-$signature = optional_param('signature', '', PARAM_TEXT); // Get the signature from the request
+$signature = isset($_SESSION['signature']) ? $_SESSION['signature'] : ''; // Get the signature from the session
 $matching_record = isset($_SESSION['matching_record']) ? $_SESSION['matching_record'] : null; // Get the matching record from the session
+
 foreach ($seal_admin as $record) {
     if (isset($record->signaturehash) && $record->signaturehash === $signature) {
         $matching_record = $record;
@@ -19,21 +24,19 @@ foreach ($seal_admin as $record) {
 
 if (!is_null($matching_record)) {
     $mensaje = 'false';
-    // Use $matching_record to access the contents of the matching row
 } else {
     $mensaje = 'true';
 }
 
-
-if ($ADMIN->fulltree) {
+if (isset($ADMIN) && $ADMIN->fulltree) {
     if ($matching_record == null) {
         $settings->add(new admin_setting_heading('uno', get_string('settings_start', 'seal'), ''));
         $settings->add(new admin_setting_description('seal/wallet_button', '', '<button type="button" id="metamaskButton">' . get_string('wallet_button', 'seal') . '</button>'));
     } else if ($matching_record->enabledcreate == '0') {
-        $settings->add(new admin_setting_description('seal/disconnect_button', '', '<button type="button" id="disconnectButton">Disconnect Wallet</button>'));
+        $settings->add(new admin_setting_description('seal/disconnect_button', '', '<button type="button" id="disconnectButton">' . get_string('disconnect_button', 'seal') . '</button>'));
         $settings->add(new admin_setting_heading('uno', get_string('settings_not_enabled', 'seal'), ''));
     } else if ($matching_record->enabledcreate == '1' && $matching_record->enabledattestation == '1') {
-        $settings->add(new admin_setting_description('seal/disconnect_button', '', '<button type="button" id="disconnectButton">Disconnect Wallet</button>'));
+        $settings->add(new admin_setting_description('seal/disconnect_button', '', '<button type="button" id="disconnectButton">' . get_string('disconnect_button', 'seal') . '</button>'));
         $settings->add(new admin_setting_heading('uno', get_string('settings_attestation_enabled', 'seal'), ''));
 
         // Predefined values
@@ -74,10 +77,8 @@ if ($ADMIN->fulltree) {
         $settings->add(new admin_setting_configtext('seal/contactphone', get_string('contactphone', 'seal'), '', $predefined_values['contactphone'], PARAM_TEXT));
         $settings->add(new admin_setting_configtext('seal/contactaddress', get_string('contactaddress', 'seal'), '', $predefined_values['contactaddress'], PARAM_TEXT));
         $settings->add(new admin_setting_configtext('seal/contactwebsite', get_string('contactwebsite', 'seal'), '', $predefined_values['contactwebsite'], PARAM_URL));
-
-        // Include the JavaScript module
     } else if ($matching_record->enabledcreate == '1' && $matching_record->enabledattestation == '0') {
-        $settings->add(new admin_setting_description('seal/disconnect_button', '', '<button type="button" id="disconnectButton">Disconnect Wallet</button>'));
+        $settings->add(new admin_setting_description('seal/disconnect_button', '', '<button type="button" id="disconnectButton">' . get_string('disconnect_button', 'seal') . '</button>'));
 
         $settings->add(new admin_setting_heading('uno', get_string('enable_certificates', 'seal'), ''));
 

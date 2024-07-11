@@ -1,7 +1,7 @@
 <?php
 require_once('../../config.php');
 require_login();
-session_start(); // Start the session
+\core\session\manager::start(); // Start the session using Moodle's session manager
 
 $rawData = file_get_contents("php://input");
 $data = json_decode($rawData, true);
@@ -12,8 +12,9 @@ $userAddress = isset($data['userAddress']) ? $data['userAddress'] : '';
 $response = new stdClass();
 
 if ($action === 'verify') {
-    error_log("Received signature: $signature");
-    error_log("Received userAddress: $userAddress");
+    // Log the received data
+    debugging("Received signature: $signature", DEBUG_DEVELOPER);
+    debugging("Received userAddress: $userAddress", DEBUG_DEVELOPER);
 
     global $DB;
     $seal_admin = $DB->get_records('seal_admin');
@@ -27,10 +28,12 @@ if ($action === 'verify') {
     }
 
     if ($matching_record) {
-        error_log("Matching record found: " . json_encode($matching_record));
+        // Log the matching record
+        debugging("Matching record found: " . json_encode($matching_record), DEBUG_DEVELOPER);
         $_SESSION['matching_record'] = $matching_record; // Store the matching record in the session
     } else {
-        error_log("No matching record found.");
+        // Log no matching record found
+        debugging("No matching record found.", DEBUG_DEVELOPER);
         unset($_SESSION['matching_record']); // Clear the session if no matching record is found
     }
 

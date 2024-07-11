@@ -65,6 +65,7 @@ $string['modulename_help'] = 'CertifiEth facilitates seamless attestation and is
 $string['nocertifiethinstances'] = 'No certifieth instances found.';
 $string['missingrequiredfields'] = 'The Certifieth plugin cannot be activated because some required fields are missing. Please fill in all fields in the plugin settings.';
 $string['enable_certificates'] = 'Please fill this form to enable the generation of certificates';
+$string['disconnect_button'] = 'Disconnect Wallet';
 
 
 
