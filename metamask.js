@@ -8,7 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
           requestFailed: 'Request failed!',
           disconnectWallet: 'Disconnect Wallet',
           failedToResetSignature: 'Failed to reset signature',
-          signMessage: 'Please sign this message to request your certificate.'
+          signMessage: 'Please sign this message to request your certificate.',
+          verified: 'Verified'
       }
   };
 
@@ -52,8 +53,10 @@ document.addEventListener('DOMContentLoaded', () => {
                   method: 'personal_sign',
                   params: [message, userAddress],
               });
-              console.log('Sending data to server:', { signature, userAddress });
-              const response = await sendDataToServer('verify', signature, userAddress);
+              const actionType = button.getAttribute('data-action') || 'verifyAdmin';
+
+              // console.log('Sendirver:', actionType);
+              const response = await sendDataToServer(actionType, signature, userAddress);
               console.log('Response from server:', response);
               updateView(response);
           } catch (error) {
@@ -86,7 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
   async function sendDataToServer(action, signature = '', userAddress = '') {
       console.log('Sending to server:', action, signature, userAddress);
       try {
-          const response = await fetch('/mod/seal/metamasksignature.php', { // Adjust the path as needed
+          const response = await fetch('/mod/seal/metamasksignature.php', { 
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ action, signature, userAddress }),

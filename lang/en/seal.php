@@ -27,8 +27,8 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'Seal Attestation';
 $string['modulename'] = 'Seal Attestation';
-$string['description'] = 'CertifiEth represents a groundbreaking fusion of Moodle, the renowned platform trusted by over 350,000 educational institutions worldwide, and Blockchain technology. Our innovative Moodle plug-in introduces a pioneering method to generate on-chain educational certifications. Leveraging the Ethereum blockchain, CertifiEth facilitates seamless attestation and issuance of NFT-based certifications, streamlining the process for institutions and educators globally.';
-$string['modulename_help'] = 'CertifiEth facilitates seamless attestation and issuance of NFT-based certifications, streamlining the process for institutions and educators globally..The teacher can create the certified for the student........';
+$string['description'] = 'Seal represents a groundbreaking fusion of Moodle, the renowned platform trusted by over 350,000 educational institutions worldwide, and Blockchain technology. Our innovative Moodle plug-in introduces a pioneering method to generate on-chain educational certifications. Leveraging the Ethereum blockchain, Seal facilitates seamless attestation and issuance of NFT-based certifications, streamlining the process for institutions and educators globally.';
+$string['modulename_help'] = 'Seal facilitates seamless attestation and issuance of NFT-based certifications, streamlining the process for institutions and educators globally..The teacher can create the certified for the student........';
 $string['sealsettings'] = 'Settings';
 $string['sealfieldset'] = 'Field Set';
 $string['sealname'] = 'Name Certify';
@@ -55,17 +55,20 @@ $string['contactphone'] = 'Contact Phone';
 $string['contactaddress'] = 'Contact Physical Address';
 $string['contactwebsite'] = 'Contact Website';
 $string['modulenameplural'] = 'Certifi-Eth 4 moodle';
-$string['certifiethname'] = 'Ref ID';
-$string['certifiethname_help'] = 'To create a new RefId please follow this link: google.com';
-$string['certifiethsettings'] = 'Certificate TH settings';
-$string['certifiethfieldset'] = 'Custom example fieldset';
-$string['shortDescription'] = 'Evolve Educational Certifications with On-chain Verification via Moodle Plug-in';
-$string['description'] = 'CertifiEth represents a groundbreaking fusion of Moodle, the renowned platform trusted by over 350,000 educational institutions worldwide, and Blockchain technology. Our innovative Moodle plug-in introduces a pioneering method to generate on-chain educational certifications. Leveraging the Ethereum blockchain, CertifiEth facilitates seamless attestation and issuance of NFT-based certifications, streamlining the process for institutions and educators globally.';
-$string['modulename_help'] = 'CertifiEth facilitates seamless attestation and issuance of NFT-based certifications, streamlining the process for institutions and educators globally..The teacher can create the certified for the student........';
-$string['nocertifiethinstances'] = 'No certifieth instances found.';
-$string['missingrequiredfields'] = 'The Certifieth plugin cannot be activated because some required fields are missing. Please fill in all fields in the plugin settings.';
+$string['Sealname'] = 'Ref ID';
+$string['Sealname_help'] = 'To create a new RefId please follow this link: google.com';
+$string['Sealsettings'] = 'Certificate TH settings';
+$string['Sealfieldset'] = 'Custom example fieldset';
+$string['shortDescription'] = 'Evolve Educational Certifications with On-chain Verification via our Moodle Plug-in';
+$string['description'] = 'Seal represents a groundbreaking fusion of Moodle, the renowned platform trusted by over 350,000 educational institutions worldwide, and Blockchain technology. Our innovative Moodle plug-in introduces a pioneering method to generate on-chain educational certifications. Leveraging the Ethereum blockchain, Seal facilitates seamless attestation and issuance of NFT-based certifications, streamlining the process for institutions and educators globally.';
+$string['modulename_help'] = 'Seal facilitates seamless attestation and issuance of NFT-based certifications, streamlining the process for institutions and educators globally..The teacher can create the certified for the student........';
+$string['nocertifiethinstances'] = 'No Seal instances found.';
+$string['missingrequiredfields'] = 'The Seal plugin cannot be activated because some required fields are missing. Please fill in all fields in the plugin settings.';
 $string['enable_certificates'] = 'Please fill this form to enable the generation of certificates';
 $string['disconnect_button'] = 'Disconnect Wallet';
+$string['verified'] = 'Verified';
+$string['adressList'] = 'Wallet Addresses';
+$string['adressList_desc'] = 'Enter one wallet address per line.';
 
 
 
