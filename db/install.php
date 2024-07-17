@@ -32,9 +32,3 @@ function xmldb_seal_install() {
 }
 
 require(__DIR__.'/../../../config.php');
-
-$templatecontext = (object)[
-    'var1' => 'texto a pasar de install',
-];
-
-echo $OUTPUT->render_from_template('mod_seal/install', $templatecontext);
