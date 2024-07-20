@@ -66,9 +66,14 @@ $string['nocertifiethinstances'] = 'No Seal instances found.';
 $string['missingrequiredfields'] = 'The Seal plugin cannot be activated because some required fields are missing. Please fill in all fields in the plugin settings.';
 $string['enable_certificates'] = 'Please fill this form to enable the generation of certificates';
 $string['disconnect_button'] = 'Disconnect Wallet';
-$string['verified'] = 'Verified';
+$string['verified'] = 'To see your certificates, please follow this link:';
 $string['adressList'] = 'Wallet Addresses';
 $string['adressList_desc'] = 'Enter one wallet address per line.';
+$string['agree_terms'] = 'Agree to Terms and Conditions';
+$string['agree_terms_desc'] = 'By clicking this button, you agree to the terms and conditions.';
+$string['dropdown_section'] = 'Dropdown Section';
+$string['dropdown_label'] = 'Enable Certificates';
+
 
 
 

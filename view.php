@@ -74,12 +74,11 @@ echo $OUTPUT->header();
 // }
 // else
 // {
-    $is_verified = isset($_SESSION['matching_record']);
-    error_log("Is Verified: " . ($is_verified ? 'true' : 'false'));
+    $matching_record = isset($_SESSION['matching_record'])? $_SESSION['matching_record'] : null;
 
     $templatecontext = (object)[
-        'is_verified' => $is_verified,
-        'verification_message' => $is_verified ? get_string('verified', 'mod_seal') : '',
+        'link' => $matching_record ? $matching_record->url : '',
+        'verification_message' => $matching_record ? get_string('verified', 'mod_seal') : '',
         'metamask_button_text' => get_string('wallet_button', 'mod_seal'),
         'action_type' => 'verifyUser'
     ];
