@@ -73,7 +73,9 @@ $string['agree_terms'] = 'Agree to Terms and Conditions';
 $string['agree_terms_desc'] = 'By clicking this button, you agree to the terms and conditions.';
 $string['dropdown_section'] = 'Dropdown Section';
 $string['dropdown_label'] = 'Enable Certificates';
-
+$string['wallet'] = 'Wallet';
+$string['sealname_help'] = 'Enter the name of the certification';
+$string['usersneed'] = 'users wallet for attestation';
 
 
 
