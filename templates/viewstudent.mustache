@@ -24,11 +24,11 @@
 }}
 
 <div class="mod-seal">
-    {{#is_verified}}
+    {{#link}}
         <button type="button" id="disconnectButton">{{#str}}disconnect_button, seal{{/str}}</button>
-        <div id="verificationMessage">{{verification_message}}</div>
-    {{/is_verified}}
-    {{^is_verified}}
+        <div id="verificationMessage">{{verification_message}}{{link}}</div>
+    {{/link}}
+    {{^link}}
         <button type="button" id="metamaskButton" data-action="{{action_type}}">{{metamask_button_text}}</button>
-    {{/is_verified}}
+    {{/link}}
 </div>
