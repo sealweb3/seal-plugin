@@ -27,25 +27,24 @@
  * Custom code to be run on installing the plugin.
  */
 
-defined('MOODLE_INTERNAL') || die;
+ defined('MOODLE_INTERNAL') || die();
 
-$capabilities = array(
-    'mod/seal:view' => array(
-        'captype' => 'read',
-        'contextlevel' => CONTEXT_MODULE,
-        'archetypes' => array(
-            'guest' => CAP_ALLOW,
-            'user' => CAP_ALLOW,
-        )
-    ),
-    'mod/seal:manage' => array(
-
-        'captype' => 'read',
-        'contextlevel' => CONTEXT_MODULE,
-        'archetypes' => array(
-            'teacher' => CAP_ALLOW,
-            'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
-        )
-    ),
-);
+ $capabilities = array(
+     'mod/seal:view' => array(
+         'captype' => 'read',
+         'contextlevel' => CONTEXT_MODULE,
+         'archetypes' => array(
+             'guest' => CAP_ALLOW,
+             'user' => CAP_ALLOW,
+         )
+     ),
+     'mod/seal:manage' => array(
+         'captype' => 'write',
+         'contextlevel' => CONTEXT_MODULE,
+         'archetypes' => array(
+             'teacher' => CAP_ALLOW,
+             'editingteacher' => CAP_ALLOW,
+             'manager' => CAP_ALLOW
+         )
+     ),
+ );

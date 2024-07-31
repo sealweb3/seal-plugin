@@ -60,31 +60,24 @@ $PAGE->set_title(format_string($moduleinstance->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($modulecontext);
 
-$PAGE->requires->js(new moodle_url('/mod/seal/metamask.js'));
-
 echo $OUTPUT->header();
 
-// if(has_capability('mod/seal:manage', $modulecontext)){
-//     $otra = "tiene acceso";
-//     $templatecontext = (object)[
-//         'var1' => $otra,
-//     ];
-//     echo $OUTPUT->render_from_template('mod_seal/viewsteacher', $templatecontext);
-
-// }
-// else
-// {
-    $matching_record = isset($_SESSION['matching_record'])? $_SESSION['matching_record'] : null;
-
+if(has_capability('mod/seal:manage', $modulecontext)){
+    $otra = "tiene acceso";
     $templatecontext = (object)[
-        'link' => $matching_record ? $matching_record->url : '',
-        'verification_message' => $matching_record ? get_string('verified', 'mod_seal') : '',
-        'metamask_button_text' => get_string('wallet_button', 'mod_seal'),
-        'action_type' => 'verifyUser'
+        'var1' => $otra,
     ];
-    
+    echo $OUTPUT->render_from_template('mod_seal/viewsteacher', $templatecontext);
+
+}
+else
+{
+    $otra = "sin acceso";
+    $templatecontext = (object)[
+        'var1' => $otra,
+    ];
     echo $OUTPUT->render_from_template('mod_seal/viewstudent', $templatecontext);
 
-// }
+}
 
 echo $OUTPUT->footer();

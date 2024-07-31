@@ -15,20 +15,15 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template mod_seal/viewstudent
+    @template mod_certifieth/view
+
 
     Example context (json):
     {
-        "var1": "Some value"
+       
     }
-}}
 
-<div class="mod-seal">
-    {{#link}}
-        <button type="button" id="disconnectButton">{{#str}}disconnect_button, seal{{/str}}</button>
-        <div id="verificationMessage">{{verification_message}}{{link}}</div>
-    {{/link}}
-    {{^link}}
-        <button type="button" id="metamaskButton" data-action="{{action_type}}">{{metamask_button_text}}</button>
-    {{/link}}
-</div>
+}}
+<h1>Estudiante</h1>
+<h2>Aparece un boton para que cargue su billetera y firma</h2>
+<d>{{var1}}</d>

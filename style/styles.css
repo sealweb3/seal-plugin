@@ -1,0 +1,80 @@
+
+
+#formStart label {
+  color: #16a085; /* This sets the color of all labels within the formStart container */
+}
+
+.landing-page-container {
+  margin-top: 3%;
+  margin-right: 40%;
+  align-items: center;
+}
+label  {
+  color: #16a085;
+  font-weight: bold; 
+}
+#id_certifiethfile_label  {
+  color: #16a085;
+  font-weight: bold; 
+}
+
+.seal-logo{
+  width: 250px;
+  height: 250px;
+  margin: 7% 40% 7% 30%;
+}
+
+.sponsor-logos-container {
+  display: flex;
+  justify-content: center; 
+  flex-wrap: nowrap; 
+}
+
+.mainButton {
+  display: flex;
+  justify-content: center; 
+  /* width: 50%; */
+}
+
+.sponsor-logo {
+  width: 100px;
+  height: 100px;
+  margin: 1% 5%;
+}
+.sponsor-logo1 {
+  width: 100px;
+  height: 80px;
+  margin: 1% 5%;
+}
+.continue-button-container {
+  margin-bottom: 3%;
+  width: 100%;
+  display: grid;
+}
+/* .filemanager {
+  height: 240px;
+  margin-top: 4%;
+} */
+#id_certifiethfile_fieldset p {
+  display: none;
+}
+.fp-restrictions, .form-filetypes-descriptions{
+  display: none;
+}
+.mainButton {
+  justify-self: center;
+}
+.static-element {
+  width: 100%; 
+  margin: 4%; 
+  display: block;
+  text-align: center;
+}
+.static-element-text{
+  margin-top: 0.5%;
+}
+.submit-button-container {
+  text-align: center; 
+  margin-left: 25%;
+  margin-top: 3%;
+}

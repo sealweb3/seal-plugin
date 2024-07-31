@@ -38,6 +38,7 @@ $string['wallet_button'] = 'Connect Wallet';
 $string['wallet_free_certificates_button'] = 'Get 5 free certificates';
 $string['wallet_button_desc'] = 'Press the button to load the wallet with signature';
 $string['settings_not_enabled'] = 'You do not have a license for the use of the software, to obtain it or to get 5 test certificates contact us at seal@attestation.com';
+$string['settings_Unlicensed'] = 'Unlicensed';
 $string['settings_attestation_enabled'] = 'Form to attest company';
 $string['settings_create_certificate'] = 'Menu to create the certificate for use by teachers and users. After creation, a button to request attestation is provided';
 $string['entityname'] = 'Entity Name';
@@ -75,7 +76,3 @@ $string['dropdown_section'] = 'Dropdown Section';
 $string['dropdown_label'] = 'Enable Certificates';
 $string['wallet'] = 'Wallet';
 $string['sealname_help'] = 'Enter the name of the certification';
-$string['usersneed'] = 'users wallet for attestation';
-
-
-

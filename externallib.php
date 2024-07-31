@@ -27,6 +27,7 @@ class mod_seal_external {
      * @param stdClass $inputdata
      * @return stdClass
      */
+
     public static function attestation_student($user, $certify) {
         foreach ($user as $key => $object) {
             $result[$key]->iduser=$object->id;

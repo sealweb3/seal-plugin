@@ -40,26 +40,25 @@ class mod_seal_mod_form extends moodleform_mod {
      */
     public function definition() {
         $logourl = new moodle_url('/mod/certifieth/pix/LogoCertifiEth.svg');
-        global $CFG, $DB, $COURSE;
+        global $CFG, $DB;
 
         $mform = $this->_form;
 
         // Adding the "general" fieldset, where all the common settings are shown.
         $mform->addElement('header', 'general', get_string('general', 'form'));
 
-        $certifications = $DB->get_records_menu('seal_course_certify', null, '', 'id, name');
-
         // Adding the standard "name" field.
-        $mform->addElement('select', 'idcoursecertify', get_string('sealname', 'mod_seal'), $certifications);
-
-        //$mform->addElement('text', 'name', get_string('sealname', 'mod_seal'), array('size' => '64'));
-        $mform->addElement('static', 'my_text', '', 'En este especaio se coloca lo necesario para solicitar la billetera');
+        $mform->addElement('text', 'name', get_string('sealname', 'mod_seal'), array('size' => '64'));
 
         if (!empty($CFG->formatstringstriptags)) {
             $mform->setType('name', PARAM_TEXT);
         } else {
             $mform->setType('name', PARAM_CLEANHTML);
         }
+
+        $mform->addRule('name', null, 'required', null, 'client');
+        $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
+        $mform->addHelpButton('name', 'sealname', 'mod_seal');
 
         // Adding the standard "intro" and "introformat" fields.
         if ($CFG->branch >= 29) {
@@ -68,24 +67,10 @@ class mod_seal_mod_form extends moodleform_mod {
             $this->add_intro_editor();
         }
 
-        $mform->addRule('certification', null, 'required', null, 'client');
-        $mform->addRule('certification', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
-        $mform->addHelpButton('certification', 'sealname', 'mod_seal');
-
-        $mform->addElement('header', 'user', get_string('usersneed', 'mod_seal'));
-        $mform->setExpanded('user');
-
-        // Fetch enrolled users in the current course.
-        $context = context_course::instance($COURSE->id);
-        $enrolledusers = get_enrolled_users($context);
-
-
-        foreach ($enrolledusers as $user) {
-            $walletid = 'wallet_' . $user->id;
-            $mform->addElement('text', $walletid, $user->firstname.' '.$user->lastname, array('size' => '20'));
-            $mform->setType($walletid, PARAM_TEXT);
-        }
-
+        // Adding the rest of mod_seal settings, spreading all them into this fieldset
+        // ... or adding more fieldsets ('header' elements) if needed for better logic.
+        $mform->addElement('static', 'label1', 'sealsettings', get_string('sealsettings', 'mod_seal'));
+        $mform->addElement('header', 'sealfieldset', get_string('sealfieldset', 'mod_seal'));
 
         // Add standard elements.
         $this->standard_coursemodule_elements();
@@ -93,6 +78,4 @@ class mod_seal_mod_form extends moodleform_mod {
         // Add standard buttons.
         $this->add_action_buttons();
     }
-
-    
 }
