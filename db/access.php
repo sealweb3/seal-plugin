@@ -30,16 +30,34 @@
  defined('MOODLE_INTERNAL') || die();
 
  $capabilities = array(
-     'mod/seal:view' => array(
+ 
+     'mod/seal:addinstance' => array(
+         'riskbitmask' => RISK_XSS,
+ 
+         'captype' => 'write',
+         'contextlevel' => CONTEXT_COURSE,
+         'archetypes' => array(
+             'editingteacher' => CAP_ALLOW,
+             'manager' => CAP_ALLOW
+         ),
+         'clonepermissionsfrom' => 'moodle/course:manageactivities'
+     ),
+ 
+     'mod/seal:participate' => array(
+ 
          'captype' => 'read',
          'contextlevel' => CONTEXT_MODULE,
          'archetypes' => array(
-             'guest' => CAP_ALLOW,
-             'user' => CAP_ALLOW,
+             'student' => CAP_ALLOW,
+             'teacher' => CAP_ALLOW,
+             'editingteacher' => CAP_ALLOW,
+             'manager' => CAP_ALLOW
          )
      ),
-     'mod/seal:manage' => array(
-         'captype' => 'write',
+ 
+     'mod/seal:readresponses' => array(
+ 
+         'captype' => 'read',
          'contextlevel' => CONTEXT_MODULE,
          'archetypes' => array(
              'teacher' => CAP_ALLOW,
@@ -47,4 +65,16 @@
              'manager' => CAP_ALLOW
          )
      ),
+ 
+     'mod/seal:download' => array(
+ 
+         'captype' => 'read',
+         'contextlevel' => CONTEXT_MODULE,
+         'archetypes' => array(
+             'teacher' => CAP_ALLOW,
+             'editingteacher' => CAP_ALLOW,
+             'manager' => CAP_ALLOW
+         )
+     )
+ 
  );
