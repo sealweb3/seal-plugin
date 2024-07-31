@@ -27,7 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 //require(__DIR__.'/../../config.php');
 global $DB;
 
-$PAGE->requires->css(new moodle_url('/mod/seal/style/styles.css'));
 $PAGE->requires->js(new moodle_url('/mod/seal/js/web3.js'));
 
 $seal_admin = $DB->get_records('seal_admin');
