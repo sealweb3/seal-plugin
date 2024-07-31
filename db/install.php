@@ -31,4 +31,4 @@ function xmldb_seal_install() {
     return true;
 }
 
-redirect(new moodle_url('/admin/settings.php', array('section' => 'modsettingsseal')));
+redirect(new moodle_url('/admin/settings.php', array('section' => 'modsettingseal')));
