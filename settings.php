@@ -25,17 +25,21 @@
 
 defined('MOODLE_INTERNAL') || die();
 //require(__DIR__.'/../../config.php');
+require_once(__DIR__.'/externallib.php');
 global $DB;
 
 $PAGE->requires->js(new moodle_url('/mod/seal/js/web3.js'));
+$isAuthorized = get_config('mod_seal', 'isAuthorized');
 
-$seal_admin = $DB->get_records('seal_admin');
+$name = get_config('mod_seal', 'name');
+$profileid = get_config('mod_seal', 'profileid');
+$agree = get_config('mod_seal', 'agree_terms');
+//set_config('name', '', 'mod_seal');
+$settings->add(new admin_setting_description('seal/intro', '', 'agree: '.$agree)); 
+$settings->add(new admin_setting_description('seal/intro2', '', 'prof: '.$profileid));
+$settings->add(new admin_setting_description('seal/intro3', '', 'name: '.$name));
 
-/*if ($hassiteconfig) {
-    $settings = new admin_settingpage('mod_seal_settings', new lang_string('pluginname', 'mod_seal'));
-
-    // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedIf*/
-    if(is_null($seal_admin[1])){
+    if($isAuthorized == ''){
         $settings->add(new admin_setting_heading('uno', get_string('settings_start', 'seal'), ''));
         $settings->add(new admin_setting_description('seal/wallet_button', '', '<button type="button" class="btn btn-primary" id="firstButton">' . get_string('wallet_button', 'seal') . '</button>'));
         $otra = new moodle_url('/mod/seal/pix/seal-logo.jpg');
@@ -44,7 +48,7 @@ $seal_admin = $DB->get_records('seal_admin');
         ];
         $settings->add(new admin_setting_description('seal/intro_screen', '', $OUTPUT->render_from_template('mod_seal/setting_one', $templatecontext))); 
     }
-    else if ($seal_admin[1]->enabledcreate == '0' && $seal_admin[1]->enabledattestation == '0'){
+    else if ($isAuthorized == '0' && $name == ''){
         $settings->add(new admin_setting_heading('uno', get_string('settings_Unlicensed', 'seal'), ''));
         $settings->add(new admin_setting_description('seal/wallet_button', '', '<button type="button" class="btn btn-primary" id="firstButton">' . get_string('wallet_button', 'seal') . '</button>'));
         $otra = new moodle_url('/mod/seal/pix/seal-logo.jpg');
@@ -54,7 +58,7 @@ $seal_admin = $DB->get_records('seal_admin');
         $settings->add(new admin_setting_description('seal/intro_screen', '', $OUTPUT->render_from_template('mod_seal/setting_two', $templatecontext)));
 
     }
-    else if ($seal_admin[1]->enabledcreate == '0' &&$seal_admin[1]->enabledattestation == '1'){
+    else if ($isAuthorized == '0' && $name != ''){
         $settings->add(new admin_setting_heading('uno', get_string('settings_attestation_enabled', 'seal'), ''));
 
         $predefined_values = array(
@@ -98,19 +102,23 @@ $seal_admin = $DB->get_records('seal_admin');
             } 
         } 
     }
-    else if ($seal_admin[1]->enabledcreate == '1' &&$seal_admin[1]->enabledattestation == '0'){
+    else if ($isAuthorized == '1' && $name == ''){
         $settings->add(new admin_setting_heading('uno', get_string('enable_certificates', 'seal'), ''));
         
         // Nombre de la Entidad
-        $settings->add(new admin_setting_configtext('mod_seal/entityname', get_string('entityname', 'seal'), '', '', PARAM_TEXT));
+        $settings->add(new admin_setting_configtext('mod_seal/name', get_string('entityname', 'seal'), '', '', PARAM_TEXT));
         // Descripción de la Entidad
-        $settings->add(new admin_setting_configtextarea('mod_seal/entitydescription', get_string('entitydescription', 'seal'), '', '', PARAM_TEXT));
+        $settings->add(new admin_setting_configtextarea('mod_seal/description', get_string('entitydescription', 'seal'), '', '', PARAM_TEXT));
         //webste
-        $settings->add(new admin_setting_configtext('mod_seal/contactwebsite', get_string('contactwebsite', 'seal'), '', '', PARAM_URL));
+        $settings->add(new admin_setting_configtext('mod_seal/website', get_string('contactwebsite', 'seal'), '', '', PARAM_URL));
         
         $settings->add(new admin_setting_configtextarea('mod_seal/adressList', get_string('adressList', 'seal'), get_string('adressList_desc', 'seal'), '', PARAM_TEXT));    
         $settings->add(new admin_setting_configcheckbox('mod_seal/agree_terms', get_string('agree_terms', 'seal'), get_string('agree_terms_desc', 'seal'), 0));
 
-
+        if ($data = data_submitted() && confirm_sesskey()) {
+            //llamar a función
+            $profileid=mod_seal_external::attestation_organization();
+            set_config('profileId', $profileid, 'mod_seal');
+            set_config('name', '', 'mod_seal');
+        } 
     }
-//}

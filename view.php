@@ -81,3 +81,30 @@ else
 }
 
 echo $OUTPUT->footer();
+
+/*global $DB, $USER;
+
+// ID del curso que deseas verificar
+$courseid = 2; // Reemplazar con el ID del curso real
+
+// Obtén el contexto del curso
+$context = context_course::instance($courseid);
+
+// IDs de los roles que deseas verificar
+$roleid_teacher = $DB->get_field('role', 'id', array('shortname' => 'teacher'));
+$roleid_student = $DB->get_field('role', 'id', array('shortname' => 'student'));
+
+// Verifica si el usuario es un teacher
+$is_teacher = user_has_role_assignment($USER->id, $roleid_teacher, $context->id);
+
+// Verifica si el usuario es un student
+$is_student = user_has_role_assignment($USER->id, $roleid_student, $context->id);
+
+if ($is_teacher) {
+    echo "El usuario es un profesor.";
+} elseif ($is_student) {
+    echo "El usuario es un estudiante.";
+} else {
+    echo "El usuario no es ni profesor ni estudiante en este curso.";
+}
+*/
