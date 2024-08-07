@@ -61,46 +61,13 @@ $settings->add(new admin_setting_description('seal/intro3', '', 'name: '.$name))
     else if ($isAuthorized == '0' && $name != ''){
         $settings->add(new admin_setting_heading('uno', get_string('settings_attestation_enabled', 'seal'), ''));
 
-        $predefined_values = array(
-            'entityname' => 'Predefined Entity Name',
-            'entitydescription' => 'Predefined Entity Description',
-            'contactwebsite' => 'https://example.com',
-            'adressList' => '0x12345,0x6789a,0xbcdef',
-        );
-
-
-        $settings->add(new admin_setting_description('seal/entityname', get_string('entityname', 'seal'), $predefined_values['entityname']));
-        $settings->add(new admin_setting_description('seal/entitydescription', get_string('entitydescription', 'seal'), $predefined_values['entitydescription']));
-        $settings->add(new admin_setting_description('seal/contactwebsite', get_string('contactwebsite', 'seal'), $predefined_values['contactwebsite']));
-        $settings->add(new admin_setting_description('seal/adressList', get_string('adressList', 'seal'), $predefined_values['adressList']));
-
-        $courses = $DB->get_records('course', null, '', 'id, fullname');
-        $course_options = array();
-        foreach ($courses as $course) {
-            $course_options[$course->id] = $course->fullname;
-        }
-
-        $settings->add(new admin_setting_heading('dropdown_section', get_string('dropdown_section', 'seal'), ''));
-        $dropdown_setting = new admin_setting_configselect('seal/course_dropdown', get_string('dropdown_label', 'seal'), '', key($course_options), $course_options);
-        $settings->add($dropdown_setting);
-
-        if ($data = data_submitted() && confirm_sesskey()) {
-            $selected_course_id = get_config('seal', 'course_dropdown');
-            if ($selected_course_id) {
-                $course = $DB->get_record('course', array('id' => $selected_course_id), 'fullname');
-                $record = new stdClass();
-                $record->name = $course->fullname;
-                $record->enabled = 1;
-                $record->modality = 1;
-                $record->certifyhash = '0x12345';   
-                $record->timecreated = time();
-                $record->timemodified = time();
-                $record->intro = 'Placeholder intro';
-                $record->introformat = 1;
-
-                $DB->insert_record('seal_course_certify', $record);
-            } 
-        } 
+        
+        // Nombre de la Entidad
+        $settings->add(new admin_setting_configtext('mod_seal/name', get_string('entityname', 'seal'), '', '', PARAM_TEXT));
+        // Descripción de la Entidad
+        $settings->add(new admin_setting_configtextarea('mod_seal/description', get_string('entitydescription', 'seal'), '', '', PARAM_TEXT));
+        //webste
+        $settings->add(new admin_setting_configtext('mod_seal/website', get_string('contactwebsite', 'seal'), '', '', PARAM_URL));
     }
     else if ($isAuthorized == '1' && $name == ''){
         $settings->add(new admin_setting_heading('uno', get_string('enable_certificates', 'seal'), ''));
@@ -119,6 +86,6 @@ $settings->add(new admin_setting_description('seal/intro3', '', 'name: '.$name))
             //llamar a función
             $profileid=mod_seal_external::attestation_organization();
             set_config('profileId', $profileid, 'mod_seal');
-            set_config('name', '', 'mod_seal');
+            set_config('isAuthorized', '0', 'mod_seal');
         } 
     }

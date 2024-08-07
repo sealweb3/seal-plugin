@@ -52,6 +52,7 @@ function seal_add_instance($moduleinstance, $mform = null) {
     global $DB;
 
     $moduleinstance->timecreated = time();
+    $moduleinstance->enabled = 1;
 
     $id = $DB->insert_record('seal', $moduleinstance);
 
@@ -69,10 +70,17 @@ function seal_add_instance($moduleinstance, $mform = null) {
  * @return bool True if successful, false otherwise.
  */
 function seal_update_instance($moduleinstance, $mform = null) {
-    global $DB;
+    global $DB,$COURSE;
 
     $moduleinstance->timemodified = time();
     $moduleinstance->id = $moduleinstance->instance;
+    $context = context_course::instance($COURSE->id);
+    $enrolledusers = get_enrolled_users($context);
+    $nonteachers = array_filter($enrolledusers, function($user) use ($context) {
+        return !has_capability('moodle/course:manageactivities', $context, $user->id);
+    });
+    var_dump($nonteachers);
+    die;
 
     return $DB->update_record('seal', $moduleinstance);
 }

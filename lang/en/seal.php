@@ -26,6 +26,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'Seal Attestation';
+$string['pluginadministration'] = 'Seal Administration';
 $string['modulename'] = 'Seal Attestation';
 $string['description'] = 'Seal represents a groundbreaking fusion of Moodle, the renowned platform trusted by over 350,000 educational institutions worldwide, and Blockchain technology. Our innovative Moodle plug-in introduces a pioneering method to generate on-chain educational certifications. Leveraging the Ethereum blockchain, Seal facilitates seamless attestation and issuance of NFT-based certifications, streamlining the process for institutions and educators globally.';
 $string['modulename_help'] = 'Seal facilitates seamless attestation and issuance of NFT-based certifications, streamlining the process for institutions and educators globally..The teacher can create the certified for the student........';
@@ -76,3 +77,16 @@ $string['dropdown_section'] = 'Dropdown Section';
 $string['dropdown_label'] = 'Enable Certificates';
 $string['wallet'] = 'Wallet';
 $string['sealname_help'] = 'Enter the name of the certification';
+$string['duration'] = 'Duration';
+$string['location'] = 'Location';
+$string['partners'] = 'Partners';
+$string['certificate'] = 'Certificate';
+$string['noidprofile'] = 'Cannot be created until configuration is done in configuration';
+$string['users'] = 'Users';
+$string['lastname'] = 'Lastname';
+$string['aprobe'] = 'Aprobe';
+$string['delete'] = 'Delete';
+$string['percentage'] = 'Percentage';
+$string['firstname'] = 'Firstname';
+$string['notavailable'] = 'Not available';
+$string['teachertitle'] = 'Student ready to certificate';

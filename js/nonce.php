@@ -27,7 +27,10 @@ $responsedata = curl_exec($ch);
     
     // Obtener el nonce, aquí simulado como '102030'
     
-    $nonce = '102030'; 
+    $nonce = '102030';
+    set_config('nonce', $nonce, 'mod_seal');
+    set_config('squemaId', '0x96', 'mod_seal');
+    set_config('linkedAttestationId', '0x11e', 'mod_seal'); 
 
     // Crear la respuesta
     $response->success = true;

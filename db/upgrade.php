@@ -28,7 +28,7 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-function xmldb_survey_upgrade($oldversion) {
+function xmldb_seal_upgrade($oldversion) {
     global $CFG;
 
     // Automatically generated Moodle v3.9.0 release upgrade line.

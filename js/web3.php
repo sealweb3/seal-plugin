@@ -19,22 +19,28 @@ try {
     $action = isset($data['action']) ? $data['action'] : '';
     $signature = isset($data['signature']) ? $data['signature'] : '';
     $userAddress = isset($data['userAddress']) ? $data['userAddress'] : '';
+    $singMessage = isset($data['singMessage']) ? $data['singMessage'] : '';
+    $messagehash = isset($data['messagehash']) ? $data['messagehash'] : '';
 
-    if (empty($action) || empty($signature) || empty($userAddress)) {
+
+    if (empty($action) || empty($signature) || empty($userAddress) || empty($singMessage) || empty($messagehash)) {
         throw new Exception('Missing required data');
     }
 
-    global $DB;
     if ($action === 'action') {
+
 /*
+        //IsOwnerInProfiles(message, hashMessage, signature, address): boolean, any[]
+
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, 'https://adjusted-weekly-cattle.ngrok-free.app/certificate/certify');
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         $postData = [
-            'file' => new CURLFile($dirimage.'test.jpg', 'image/jpeg'),
-            'name' => $studentname,
-            'course' => $coursename,
+            'message' => $singMessage,
+            'hashMessage' => $hashMesssage,
+            'signature' => $signature,
+            'address' => $userAddress,
         ];
         curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
@@ -45,42 +51,29 @@ try {
         // Ejecuta la solicitud y almacena la respuesta
         $responsedata = curl_exec($ch);
 
-        $seal_admin->enabledcreate=$responsedata->enabledcreate;
-        $seal_admin->enabledattestation=$responsedata->enabledattestation;
-        $seal_admin->location=$responsedata->location;
-        $seal_admin->type=$responsedata->type;
-        $seal_admin->year=$responsedata->year;
-        $seal_admin->email=$responsedata->email;
-        $seal_admin->phone=$responsedata->phone;
-        $seal_admin->address=$responsedata->address;
-        $seal_admin->website=$responsedata->website;
-        $seal_admin->allowedwallets=$responsedata->allowedwallets;
-        $seal_admin->timecreated=time();
-        $seal_admin->wallethash=$userAddress;
-        $seal_admin->signaturehash=$signature;
+        set_config('isAuthorized', $responsedata->isAuthorized, 'mod_seal');
+        set_config('name', $responsedata->organizations->name, 'mod_seal');
+        set_config('profileId', $responsedata->organization->profileTd, 'mod_seal');
+        set_config('description', $responsedata->organization->description, 'mod_seal');
+        set_config('website', $responsedata->organization->website, 'mod_seal');
+        set_config('addressList', $responsedata->organization->managers, 'mod_seal');
+        set_config('address', $userAddress, 'mod_seal');
+        set_config('signature', $signature, 'mod_seal');
+
         */
 
 //valores simulados
-        
-        $seal_admin->enabledcreate=1;
-        $seal_admin->enabledattestation=0;
-        $seal_admin->location="";
-        $seal_admin->type=0;
-        $seal_admin->year=2000;
-        $seal_admin->email="";
-        $seal_admin->phone="";
-        $seal_admin->address="";
-        $seal_admin->website="";
-        $seal_admin->allowedwallets="";
-        $seal_admin->timecreated=time();
-        $seal_admin->wallethash=$userAddress;
-        $seal_admin->signaturehash=$signature;
+set_config('isAuthorized', '1', 'mod_seal');
+set_config('name', '', 'mod_seal');
+set_config('profileId', '', 'mod_seal');
+set_config('description', '', 'mod_seal');
+set_config('website', '', 'mod_seal');
+set_config('addressList', '', 'mod_seal');
+set_config('address', $userAddress, 'mod_seal');
+set_config('signature', $signature, 'mod_seal');
 
 
-        //función borrado base
         //pensar en un foreach para insertar todos
-        $DB->delete_records('seal_admin');
-        $id = $DB->insert_record('seal_admin', $seal_admin);
 
         $response->success = true;
         $response->id = $id;        
@@ -97,7 +90,7 @@ try {
 } catch (Exception $e) {
     $response->success = false;
     $response->error = $e->getMessage();
-    error_log('Error in metamasksignature.php: ' . $e->getMessage());
+    error_log('Error in web3.php: ' . $e->getMessage());
     http_response_code(500);
 }
 
