@@ -6,6 +6,36 @@ require_login();
 if (session_status() == PHP_SESSION_NONE) {
     \core\session\manager::start();
 }
+
+// Handle AJAX request
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $input = json_decode(file_get_contents('php://input'), true);
+    if ($input) {
+        if (isset($input['action']) && $input['action'] === 'reset') {
+            // Clear the session data
+            unset($_SESSION['input']);
+            echo json_encode(['status' => 'success', 'message' => 'Session cleared successfully']);
+        } else {
+            // Convert boolean values to strings for logging
+            if (isset($input['success'])) {
+                $input['success'] = $input['success'] ? 'true' : 'false';
+            }
+
+            // Log the received data
+            error_log('Received data: ' . print_r($input, true));
+            
+            // Store the input data in the session
+            $_SESSION['input'] = $input;
+
+            // Send a response back to the client
+            echo json_encode(['status' => 'success', 'message' => 'Data received and stored in session']);
+        }
+    } else {
+        echo json_encode(['status' => 'error', 'message' => 'No data received']);
+    }
+    exit;
+}
+
 $PAGE->requires->css(new moodle_url('/mod/seal/styles.css'));
 $PAGE->requires->js(new moodle_url('/mod/seal/metamask.js'));
 
@@ -22,30 +52,35 @@ foreach ($seal_admin as $record) {
     }
 }
 
-    $logourl = new moodle_url('/mod/seal/pix/seal-logo.jpg');
+$logourl = new moodle_url('/mod/seal/pix/seal-logo.jpg');
 
-    $landing_page_html = "";
-    $landing_page_html .= '<div class="landing-page-container">'; // New div start
-    $landing_page_html .= '<div id="shortDescription">' . get_string('shortDescription', 'seal') . '</div>';
-    $landing_page_html .= '<img src="' . $logourl . '" alt="Seal Logo" class="seal-logo">';
-    $landing_page_html .= get_string('description', 'seal');
-    $landing_page_html .= '<div class="sponsor-logos-container">';
-    $landing_page_html .= '';
-    $landing_page_html .= '</div>';
-    $landing_page_html .= '</div>';
-
+$landing_page_html = "";
+$landing_page_html .= '<div class="landing-page-container">'; // New div start
+$landing_page_html .= '<div id="shortDescription">' . get_string('shortDescription', 'seal') . '</div>';
+$landing_page_html .= '<img src="' . $logourl . '" alt="Seal Logo" class="seal-logo">';
+$landing_page_html .= get_string('description', 'seal');
+$landing_page_html .= '<div class="sponsor-logos-container">';
+$landing_page_html .= '';
+$landing_page_html .= '</div>';
+$landing_page_html .= '</div>';
 
 if (isset($ADMIN) && $ADMIN->fulltree) {
-    if ($matching_record == null) {
+    // Fetch the input data from the session
+    $input = isset($_SESSION['input']) ? $_SESSION['input'] : null;
+
+    if (!isset($input['success'])) {
+        // Condition: if !index
         $settings->add(new admin_setting_heading('uno', get_string('settings_start', 'seal'), ''));
         $settings->add(new admin_setting_description('seal/wallet_button', '', '<button type="button" id="metamaskButton">' . get_string('wallet_button', 'seal') . '</button>'));
         $settings->add(new admin_setting_description('seal/intro_screen', '', $landing_page_html)); 
 
-    } else if ($matching_record->enabledcreate == '0') {
+    } else if ($input['success'] === 'false') {
+        // Condition: if index success is false
         $settings->add(new admin_setting_description('seal/disconnect_button', '', '<button type="button" id="disconnectButton">' . get_string('disconnect_button', 'seal') . '</button>'));
         $settings->add(new admin_setting_heading('uno', get_string('settings_not_enabled', 'seal'), ''));
 
-    } else if ($matching_record->enabledcreate == '1' && $matching_record->enabledattestation == '1') {
+    } else if ($input['success'] === 'true' && count($input['data']) > 0) {
+        // Condition: if index success is true and index data array length is 0
         $settings->add(new admin_setting_description('seal/disconnect_button', '', '<button type="button" id="disconnectButton">' . get_string('disconnect_button', 'seal') . '</button>'));
         $settings->add(new admin_setting_heading('uno', get_string('settings_attestation_enabled', 'seal'), ''));
 
@@ -55,7 +90,6 @@ if (isset($ADMIN) && $ADMIN->fulltree) {
             'contactwebsite' => 'https://example.com',
             'adressList' => '0x12345,0x6789a,0xbcdef',
         );
-
 
         $settings->add(new admin_setting_description('seal/entityname', get_string('entityname', 'seal'), $predefined_values['entityname']));
         $settings->add(new admin_setting_description('seal/entitydescription', get_string('entitydescription', 'seal'), $predefined_values['entitydescription']));
@@ -68,43 +102,64 @@ if (isset($ADMIN) && $ADMIN->fulltree) {
             $course_options[$course->id] = $course->fullname;
         }
 
-        $settings->add(new admin_setting_heading('dropdown_section', get_string('dropdown_section', 'seal'), ''));
-        $dropdown_setting = new admin_setting_configselect('seal/course_dropdown', get_string('dropdown_label', 'seal'), '', key($course_options), $course_options);
-        $settings->add($dropdown_setting);
+        // $settings->add(new admin_setting_heading('dropdown_section', get_string('dropdown_section', 'seal'), ''));
+        // $dropdown_setting = new admin_setting_configselect('seal/course_dropdown', get_string('dropdown_label', 'seal'), '', key($course_options), $course_options);
+        // $settings->add($dropdown_setting);
+
+        // if ($data = data_submitted() && confirm_sesskey()) {
+        //     $selected_course_id = get_config('seal', 'course_dropdown');
+        //     if ($selected_course_id) {
+        //         $course = $DB->get_record('course', array('id' => $selected_course_id), 'fullname');
+        //         $record = new stdClass();
+        //         $record->name = $course->fullname;
+        //         $record->enabled = 1;
+        //         $record->modality = 1;
+        //         $record->certifyhash = '0x12345';   
+        //         $record->timecreated = time();
+        //         $record->timemodified = time();
+        //         $record->intro = 'Placeholder intro';
+        //         $record->introformat = 1;
+
+        //         $DB->insert_record('seal_course_certify', $record);
+        //     } 
+        // } 
+    } else if ($input['success'] === 'true' && count($input['data']) === 0) {
+
+        // Condition: if index success is true and index data array length is 1
+        $settings->add(new admin_setting_description('seal/disconnect_button', '', '<button type="button" id="disconnectButton">' . get_string('disconnect_button', 'seal') . '</button>'));
+        $settings->add(new admin_setting_heading('uno', get_string('enable_certificates', 'seal'), ''));
+        
+        // Nombre de la Entidad
+        $settings->add(new admin_setting_configtext('seal/entityname', get_string('entityname', 'seal'), '', '', PARAM_TEXT));
+        // Descripción de la Entidad
+        $settings->add(new admin_setting_configtextarea('seal/entitydescription', get_string('entitydescription', 'seal'), '', '', PARAM_TEXT));
+        // Website
+        $settings->add(new admin_setting_configtext('seal/contactwebsite', get_string('contactwebsite', 'seal'), '', '', PARAM_URL));
+        
+        // $settings->add(new admin_setting_configtextarea('seal/adressList', get_string('adressList', 'seal'), get_string('adressList_desc', 'seal'), '', PARAM_TEXT));    
+        $settings->add(new admin_setting_configcheckbox('seal/agree_terms', get_string('agree_terms', 'seal'), get_string('agree_terms_desc', 'seal'), 0));
 
         if ($data = data_submitted() && confirm_sesskey()) {
-            $selected_course_id = get_config('seal', 'course_dropdown');
-            if ($selected_course_id) {
-                $course = $DB->get_record('course', array('id' => $selected_course_id), 'fullname');
-                $record = new stdClass();
-                $record->name = $course->fullname;
-                $record->enabled = 1;
-                $record->modality = 1;
-                $record->certifyhash = '0x12345';   
-                $record->timecreated = time();
-                $record->timemodified = time();
-                $record->intro = 'Placeholder intro';
-                $record->introformat = 1;
+            $entityname = get_config('seal', 'entityname');
+            $entitydescription = get_config('seal', 'entitydescription');
+            $contactwebsite = get_config('seal', 'contactwebsite');
+            // $adressList = get_config('seal', 'adressList');
+            $agree_terms = get_config('seal', 'agree_terms');
 
-                $DB->insert_record('seal_course_certify', $record);
-            } 
-        } 
+            $payload = array(
+                'schemaId' => '0x96',
+                'validUntil' => 0,
+                'recipients' => explode(',', $adressList),
+                'indexingValue' => '',
+                'data' => array(
+                    'name' => $entityname,
+                    'description' => $entitydescription,
+                    'website' => $contactwebsite,
+                    'linkedAttestationId' => '0x11e'
+                )
+            );
 
-
-
-    } else if ($matching_record->enabledcreate == '1' && $matching_record->enabledattestation == '0') {
-            $settings->add(new admin_setting_description('seal/disconnect_button', '', '<button type="button" id="disconnectButton">' . get_string('disconnect_button', 'seal') . '</button>'));
-            $settings->add(new admin_setting_heading('uno', get_string('enable_certificates', 'seal'), ''));
-            
-            // Nombre de la Entidad
-            $settings->add(new admin_setting_configtext('seal/entityname', get_string('entityname', 'seal'), '', '', PARAM_TEXT));
-            // Descripción de la Entidad
-            $settings->add(new admin_setting_configtextarea('seal/entitydescription', get_string('entitydescription', 'seal'), '', '', PARAM_TEXT));
-            //webste
-            $settings->add(new admin_setting_configtext('seal/contactwebsite', get_string('contactwebsite', 'seal'), '', '', PARAM_URL));
-            
-            $settings->add(new admin_setting_configtextarea('seal/adressList', get_string('adressList', 'seal'), get_string('adressList_desc', 'seal'), '', PARAM_TEXT));    
-            $settings->add(new admin_setting_configcheckbox('seal/agree_terms', get_string('agree_terms', 'seal'), get_string('agree_terms_desc', 'seal'), 0));
+            send_to_external_api($payload);
+        }
     }
-
 }
