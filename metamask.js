@@ -154,16 +154,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function handleDisconnectButtonClick() {
         console.log('Disconnecting wallet');
+        try {
             const response = await fetch('/mod/seal/settings.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ action: 'reset' }),
             });
-            const result = await response.json();
-            if (result.status === 'success') {
-                console.log('Session cleared successfully:', result.message);
-                location.reload(); 
+    
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
             }
+    
+            const text = await response.text();
+            let result;
+            try {
+                result = JSON.parse(text);
+            } catch (e) {
+                throw new Error('Failed to parse JSON response: ' + text);
+            }
+    
+            if (result.status === 'success') {
+                console.log('Authorization reset successfully:', result.message);
+                location.reload(); 
+            } else {
+                console.error('Failed to reset authorization:', result.message);
+            }
+        } catch (error) {
+            console.error('Error during disconnect:', error);
+        }
     }
 
     function resetButton(button) {

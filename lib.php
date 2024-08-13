@@ -141,8 +141,8 @@ function fetch_nonce_from_api($userAddress) {
 
 function send_data_to_external_api($signature, $userAddress, $messageWithNonce) {
     // $url = 'https://run.mocky.io/v3/cd8d2524-e7db-4ad6-8a3f-dd765864048b'; // FALSE,false
-    // $url = 'https://run.mocky.io/v3/5835b23c-bd0e-46fc-8800-2e450efd96cf'; // TRUE,false
-    $url = 'https://run.mocky.io/v3/45129c60-a1b3-4a12-b3ab-cf4df423ce81'; // TRUE,true
+    $url = 'https://run.mocky.io/v3/5835b23c-bd0e-46fc-8800-2e450efd96cf'; // TRUE,false
+    // $url = 'https://run.mocky.io/v3/45129c60-a1b3-4a12-b3ab-cf4df423ce81'; // TRUE,true
 // 
     $data = array('signature' => $signature, 'userAddress' => $userAddress, 'messageWithNonce' => $messageWithNonce);
     $options = array(

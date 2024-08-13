@@ -76,6 +76,7 @@ $string['dropdown_label'] = 'Enable Certificates';
 $string['wallet'] = 'Wallet';
 $string['sealname_help'] = 'Enter the name of the certification';
 $string['usersneed'] = 'users wallet for attestation';
+$string['attestation_button'] = 'Attestation';
 
 
 
