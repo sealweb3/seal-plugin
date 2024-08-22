@@ -12,6 +12,8 @@
   "dependencies": {
     "@ethsign/sp-sdk": "^0.6.7",
     "dotenv": "^16.4.5",
+    "ethers": "^6.13.2",
+    "siwe": "^2.3.2",
     "viem": "^2.19.3"
   },
   "devDependencies": {

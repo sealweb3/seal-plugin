@@ -10,11 +10,12 @@ $rawInput = file_get_contents('php://input');
 $inputData = json_decode($rawInput, true);
 
 // Access the parameters from the decoded JSON
-$signature = $inputData['signature'] ?? '';
+$nonce = $inputData['nonce'] ?? '';
 $userAddress = $inputData['userAddress'] ?? '';
-$messageWithNonce = $inputData['messageWithNonce'] ?? '';
+$fullMessage = $inputData['fullMessage'] ?? '';
+$signature = $inputData['signature'] ?? '';
 try {
-    $response = send_data_to_external_api($signature, $userAddress, $messageWithNonce);
+    $response = send_data_to_external_api($nonce, $userAddress, $fullMessage, $signature);
     header('Content-Type: application/json');
     echo json_encode($response);
 } catch (Exception $e) {

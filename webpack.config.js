@@ -7,9 +7,12 @@ dotenv.config();
 
 module.exports = {
   mode: 'development', // Set the mode to 'development' or 'production'
-  entry: './src/attestation.js',
+  entry: {
+    attestation: './src/attestation.js',
+    metamask: './src/metamask.js', // Add your second entry file here
+  },
   output: {
-    filename: 'attestation.bundle.js',
+    filename: '[name].bundle.js', // This will generate attestation.bundle.js and siweTest.bundle.js
     path: path.resolve(__dirname, 'dist'),
   },
   module: {
@@ -29,6 +32,7 @@ module.exports = {
   plugins: [
     new webpack.DefinePlugin({
       'process.env.PRIVATE_KEY': JSON.stringify(process.env.PRIVATE_KEY),
+      'process.env.JWT_TOKEN': JSON.stringify(process.env.JWT_TOKEN),
     }),
   ],
   resolve: {

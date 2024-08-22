@@ -1,3 +1,6 @@
+import { SiweMessage } from 'siwe';
+import { ethers } from 'ethers'; // Import utils from ethers
+
 document.addEventListener('DOMContentLoaded', () => {
     const config = {
         messages: {
@@ -8,7 +11,6 @@ document.addEventListener('DOMContentLoaded', () => {
             requestFailed: 'Request failed!',
             disconnectWallet: 'Disconnect Wallet',
             failedToResetSignature: 'Failed to reset signature',
-            signMessage: 'Please sign this message to request your certificate.',
             verified: 'Verified'
         }
     };
@@ -16,22 +18,31 @@ document.addEventListener('DOMContentLoaded', () => {
     const metamaskButton = document.getElementById('metamaskButton');
     const disconnectButton = document.getElementById('disconnectButton');
 
+    function createSiweMessage(address, nonce) {
+        const message = new SiweMessage({
+            domain: 'Seal',
+            address: address,
+            statement: 'Seal attestation',
+            uri: 'https://sealweb3.com',
+            version: '1',
+            chainId: 421614,
+            nonce: nonce,
+            issuedAt: new Date().toISOString(),
+        });
+        return message.prepareMessage();
+    }
+    
     if (metamaskButton) {
         metamaskButton.addEventListener('click', async function() {
             handleMetaMaskButtonClick(this);
         });
-    } else {
-        console.error('MetaMask button not found');
-    }
+    } 
 
     if (disconnectButton) {
-        console.log('Disconnect button found');
         disconnectButton.addEventListener('click', async function() {
             handleDisconnectButtonClick();
         });
-    } else {
-        console.error('Disconnect button not found');
-    }
+    } 
 
     async function handleMetaMaskButtonClick(button) {
         button.disabled = true;
@@ -47,47 +58,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     resetButton(button);
                     return;
                 }
-    
-                const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-                const userAddress = accounts[0];
-                const message = config.messages.signMessage;
-    
-                // message hash
-
-                function toUtf8Bytes(str) {
-                    const utf8 = [];
-                    for (let i = 0; i < str.length; i++) {
-                        let charcode = str.charCodeAt(i);
-                        if (charcode < 0x80) utf8.push(charcode);
-                        else if (charcode < 0x800) {
-                            utf8.push(0xc0 | (charcode >> 6), 0x80 | (charcode & 0x3f));
-                        } else if (charcode < 0xd800 || charcode >= 0xe000) {
-                            utf8.push(0xe0 | (charcode >> 12), 0x80 | ((charcode >> 6) & 0x3f), 0x80 | (charcode & 0x3f));
-                        } else {
-                            i++;
-                            charcode = 0x10000 + (((charcode & 0x3ff) << 10) | (str.charCodeAt(i) & 0x3ff));
-                            utf8.push(0xf0 | (charcode >> 18), 0x80 | ((charcode >> 12) & 0x3f), 0x80 | ((charcode >> 6) & 0x3f), 0x80 | (charcode & 0x3f));
-                        }
-                    }
-                    return utf8;
-                }
-                
-                function bytesToHex(bytes) {
-                    return bytes.map(byte => byte.toString(16).padStart(2, '0')).join('');
-                }
-                
-                function keccak256(message) {
-                    return '0x' + bytesToHex(toUtf8Bytes('keccak256 hash of ' + message));
-                }
-                
-                function hashMessage(message) {
-                    const messageBytes = toUtf8Bytes(message);
-                    const messageHex = bytesToHex(messageBytes);
-                    return keccak256(messageHex);
-                }
-        
-                const hashedMessage = hashMessage(message);
-        
+                // const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+                const provider = new ethers.BrowserProvider(ethereum);
+                const signer = await provider.getSigner();
+                const userAddress = await signer.getAddress();
 
                 // Fetch nonce from the server using GET
                 const nonceResponse = await fetch(`/mod/seal/getnonce.php?userAddress=${encodeURIComponent(userAddress)}`);
@@ -96,14 +70,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 const nonceData = await nonceResponse.json();
                 const nonce = nonceData.nonce;
-    
-                const messageWithNonce = `${message}.  Here is your unique nonce: ${nonce}`;
-                const signature = await ethereum.request({
-                    method: 'personal_sign',
-                    params: [messageWithNonce, userAddress]
-                });
-                const response = await sendDataToServer(messageWithNonce, hashedMessage, signature, userAddress);
-                console.log('Response from server:', response);
+                const fullMessage = createSiweMessage(userAddress, nonce);
+                console.log('Full message:', fullMessage);
+
+                const signature = await signer.signMessage(fullMessage);
+                const response = await sendDataToServer(nonce, userAddress, fullMessage, signature);
                 await sendResponseToSettings(response);
                 updateView();
 
@@ -133,13 +104,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    async function sendDataToServer(messageWithNonce, signature, userAddress) {
-        console.log('Sending to server:', messageWithNonce, signature, userAddress);
+    async function sendDataToServer(nonce, userAddress, fullMessage, signature) {
+        console.log('Sending to server:', nonce, userAddress, fullMessage, signature);
         try {
             const response = await fetch('/mod/seal/sendvalidation.php', { 
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ messageWithNonce, signature, userAddress }),
+                body: JSON.stringify({ nonce, userAddress, fullMessage, signature }),
             });
             if (!response.ok) {
                 throw new Error('Network response was not ok');

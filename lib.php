@@ -110,41 +110,39 @@ function fetch_nonce_from_api($userAddress) {
     global $CFG;
     require_once($CFG->libdir . '/filelib.php'); // Ensure the core curl class is included
 
-    $curl = new \curl(); // Use the correct class name
-    $url = 'https://run.mocky.io/v3/6af96e2e-a7ca-4bfb-8ce7-25ceeaeb5ec9?userAddress=' . urlencode($userAddress);
+    $ch = curl_init();
+    $url = 'http://192.46.223.247:4000/auth/getNonce/' . urlencode($userAddress);
     error_log('URL: ' . $url);
-    $response = $curl->get($url);
+
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+    $response = curl_exec($ch);
 
     if ($response === false) {
-        $errorMessage = 'Failed to fetch nonce from external API';
+        $errorMessage = 'Failed to fetch nonce from external API: ' . curl_error($ch);
+        error_log($errorMessage);
+        curl_close($ch);
+        throw new moodle_exception($errorMessage);
+    }
+    curl_close($ch);
+    error_log('DATA: ' . $response);
+    if (!$response) {
+        $errorMessage = 'Invalid response from external API';
         error_log($errorMessage);
         throw new moodle_exception($errorMessage);
     }
-
-    $data = json_decode($response, true);
-    if (json_last_error() !== JSON_ERROR_NONE) {
-        $errorMessage = 'Invalid JSON response from external API';
-        error_log($errorMessage);
-        throw new moodle_exception($errorMessage);
-    }
-
-    if (!isset($data['nonce'])) {
-        $errorMessage = 'Nonce not found in external API response';
-        error_log($errorMessage);
-        throw new moodle_exception($errorMessage);
-    }
-
-    return $data['nonce'];
+    return $response;
 }
 
 
 
-function send_data_to_external_api($signature, $userAddress, $messageWithNonce) {
+function send_data_to_external_api($nonce, $userAddress, $fullMessage, $signature) {
     // $url = 'https://run.mocky.io/v3/cd8d2524-e7db-4ad6-8a3f-dd765864048b'; // FALSE,false
-    $url = 'https://run.mocky.io/v3/5835b23c-bd0e-46fc-8800-2e450efd96cf'; // TRUE,false
+    // $url = 'https://run.mocky.io/v3/5835b23c-bd0e-46fc-8800-2e450efd96cf'; // TRUE,false
     // $url = 'https://run.mocky.io/v3/45129c60-a1b3-4a12-b3ab-cf4df423ce81'; // TRUE,true
 // 
-    $data = array('signature' => $signature, 'userAddress' => $userAddress, 'messageWithNonce' => $messageWithNonce);
+    $data = array('nonce' => $nonce, 'userAddress' => $userAddress, 'fullMessage' => $fullMessage, 'signature' => $signature);
     $options = array(
         'http' => array(
             'header'  => "Content-Type: application/json\r\n",
@@ -152,10 +150,9 @@ function send_data_to_external_api($signature, $userAddress, $messageWithNonce) 
             'content' => json_encode($data),
         ),
     );
+    $url = 'http://192.46.223.247:4000/auth/installPlugin';
     $context  = stream_context_create($options);
     $result = file_get_contents($url, false, $context);
-
-    // Log the response for debugging
     error_log("API Response: " . $result);
 
     if ($result === FALSE) {

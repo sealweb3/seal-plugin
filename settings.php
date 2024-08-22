@@ -1,5 +1,5 @@
 <?php
-require_once(__DIR__ . '/../../config.php'); // Use __DIR__ to get the directory of the current file
+require_once(__DIR__ . '/../../config.php'); 
 require_login();
 
 // Start the session using Moodle's session manager
@@ -28,8 +28,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $PAGE->requires->css(new moodle_url('/mod/seal/styles.css'));
-$PAGE->requires->js(new moodle_url('/mod/seal/metamask.js'));
 $PAGE->requires->js(new moodle_url('/mod/seal/dist/attestation.bundle.js'));
+$PAGE->requires->js(new moodle_url('/mod/seal/dist/metamask.bundle.js'));
 
 defined('MOODLE_INTERNAL') || die();
 require_once(__DIR__.'/externallib.php');
@@ -38,15 +38,7 @@ global $DB;
 
 if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_heading('seal_settings', get_string('pluginname', 'seal'), ''));
-
-    // Add your settings fields here
-    // $settings->add(new admin_setting_configtext('seal/schemaid', get_string('schemaid', 'seal'), '', '', PARAM_TEXT));
-    // $settings->add(new admin_setting_configtext('seal/name', get_string('name', 'seal'), '', '', PARAM_TEXT));
-    // $settings->add(new admin_setting_configtext('seal/indexingvalue', get_string('indexingvalue', 'seal'), '', '', PARAM_TEXT));
 }
-
-
-// $PAGE->requires->js(new moodle_url('/mod/seal/js/web3.js'));
 
 $input = json_decode(get_config('mod_seal', 'input'), true);
 
@@ -54,28 +46,20 @@ $name = get_config('mod_seal', 'name');
 $profileid = get_config('mod_seal', 'profileid');
 $agree = get_config('mod_seal', 'agree_terms');
 
-$settings->add(new admin_setting_description('seal/intro', '', 'agree: '.$agree)); 
-$settings->add(new admin_setting_description('seal/intro2', '', 'prof: '.$profileid));
-$settings->add(new admin_setting_description('seal/intro3', '', 'name: '.$name));
-
 $input = isset($_SESSION['input']) ? $_SESSION['input'] : null;
 
 if (!isset($input['success'])) {
-    // Condition: if !index
     $settings->add(new admin_setting_heading('uno', get_string('settings_start', 'seal'), ''));
     $settings->add(new admin_setting_description('seal/wallet_button', '', '<button type="button" class="btn btn-primary" id="metamaskButton">' . get_string('wallet_button', 'seal') . '</button>'));
     $otra = new moodle_url('/mod/seal/pix/seal-logo.jpg');
     $templatecontext = (object)[
         'var1' => $otra,
     ];
-    $settings->add(new admin_setting_description('seal/intro_screen', '', $OUTPUT->render_from_template('mod_seal/setting_one', $templatecontext))); 
+    // $settings->add(new admin_setting_description('seal/intro_screen', '', $OUTPUT->render_from_template('mod_seal/setting_one', $templatecontext))); 
 } else if ($input['success'] === 'false') {
-    // Condition: if index success is false
     $settings->add(new admin_setting_description('seal/disconnect_button', '', '<button type="button" id="disconnectButton">' . get_string('disconnect_button', 'seal') . '</button>'));
     $settings->add(new admin_setting_heading('uno', get_string('settings_not_enabled', 'seal'), ''));
 } else if ($input['success'] === 'true' && count($input['data']) > 0) {
-    // Condition: if index success is true and index data array length is 0
-    $settings->add(new admin_setting_description('seal/disconnect_button', '', '<button type="button" id="disconnectButton">' . get_string('disconnect_button', 'seal') . '</button>'));
     $settings->add(new admin_setting_heading('uno', get_string('settings_attestation_enabled', 'seal'), ''));
 
     $predefined_values = array(
