@@ -15,7 +15,7 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template mod_certifieth/view
+    @template mod_seal/view
 
 
     Example context (json):
@@ -45,7 +45,7 @@
             <td>{{wallet}}</td>
             <td>{{percentage}}</td>
             <td>{{aprobe}}</td>
-            <td><a href="" id="{{id}}"><i class="icon fa fa-trash fa-fw " title="Delete" role="img" aria-label="Delete"></i></a>
+            <td><a href="lib.php?userid={{id}}&action=delete" onclick="return confirm('¿Está seguro de que desea eliminar este usuario?');" id="{{id}}"><i class="icon fa fa-trash fa-fw " title="Delete" role="img" aria-label="Delete"></i></a>
             </td>
         </tr>
         {{/table}}

@@ -15,7 +15,7 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template mod_certifieth/view
+    @template mod_seal/view
 
 
     Example context (json):
@@ -24,5 +24,31 @@
     }
 
 }}
-<h1>Manager</h1>
+<h1>{{#str}}managertitle, mod_seal{{/str}}</h1>
 <h2>{{var1}}</h2>
+<p></p>
+
+<button type="button" class="btn btn-primary" id="managerButton">{{#str}}wallet_button, mod_seal{{/str}}</button>
+<p></p>
+
+<table class="generaltable">
+    <thead>
+        <tr>
+            <th>{{#str}}name, mod_seal{{/str}}</th>
+            <th>{{#str}}wallet, mod_seal{{/str}}</th>
+            <th>{{#str}}url, mod_seal{{/str}}</th>
+            <th>{{#str}}select, mod_seal{{/str}}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#table}}
+        <tr>
+            <td>{{name}}</td>
+            <td>{{wallet}}</td>
+            <td><a href="{{url}}">{{url}}</a></td>
+            <td><input type="checkbox" id="select_{{id}}" name="select_{{id}}" value="{{id}}"></td>
+        </tr>
+        {{/table}}
+    </tbody>
+</table>
+

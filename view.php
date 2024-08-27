@@ -53,14 +53,28 @@ $PAGE->set_url('/mod/seal/view.php', array('id' => $cm->id));
 $PAGE->set_title(format_string($moduleinstance->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($modulecontext);
-$PAGE->requires->js(new moodle_url('/mod/seal/js/web3.js'));
 
 echo $OUTPUT->header();
 
 if(has_capability('moodle/site:config',$modulecontext)){
-    $otra = "acceso manager";
+    $PAGE->requires->js(new moodle_url('/mod/seal/js/web3manager.js'));
+    $users = $DB->get_records('seal_user', array('course' => $COURSE->id));
+
+    // Convertir el objeto de usuarios en un array.
+    $usersArray = [];
+    foreach ($users as $user) {
+        $nameuser = $DB->get_record('user', array('id' => $user->iduser));
+        // Aquí puedes añadir lógica para formatear los datos del usuario si es necesario.
+        $usersArray[] = [
+            'id' => $user->id,
+            'name' => $nameuser->firstname.' '.$nameuser->lastname,
+            'wallet' => $user->wallethash,
+            'ipfs' => $user->ipfs,
+        ];
+    }
     $templatecontext = (object)[
-        'var1' => $otra,
+        'table' => $usersArray,
+        'var1' => $COURSE->id,
     ];
     echo $OUTPUT->render_from_template('mod_seal/viewmanager', $templatecontext);
 }
@@ -75,8 +89,8 @@ else if(has_capability('moodle/course:manageactivities', $modulecontext)){
     $users = array();
     foreach ($nonteachers as $user) {
         $walletid = 'wallet_' . $user->id;
-        $waluser = $DB->get_record('user', array('id' => $user->id));
-        $wallet = isset($waluser->wallet) ? $waluser->wallet : get_string('notavailable', 'mod_seal');
+        $waluser = $DB->get_record('seal_user', array('iduser' => $user->id));
+        $wallet = isset($waluser->wallethash) ? $waluser->wallethash : get_string('notavailable', 'mod_seal');
 
         $completion = new completion_info($course);
         $iscomplete = $completion->is_course_complete($user->id);
@@ -110,12 +124,33 @@ else if(has_capability('moodle/course:manageactivities', $modulecontext)){
 }
 else
 {
-    $otra = "Acceso estudiante";
-    $templatecontext = (object)[
-        'var1' => $otra,
-    ];
-    echo $OUTPUT->render_from_template('mod_seal/viewstudent', $templatecontext);
-
+    $userview = $DB->get_record('seal_user', array('iduser' => $USER->id));
+    if(!$userview || empty((array)$userview)){
+        $PAGE->requires->js(new moodle_url('/mod/seal/js/web3student.js'));
+        $otra = "no wallet";
+        $templatecontext = (object)[
+            'var1' => $otra,
+        ];
+        echo $OUTPUT->render_from_template('mod_seal/viewstudentone', $templatecontext);
+    }
+    else if(is_null($userview->url)){
+        $PAGE->requires->js(new moodle_url('/mod/seal/js/web3student.js'));
+        $templatecontext = (object)[
+            'wallet' => $userview->wallethash,
+            'signature' => $userview->signaturehash,
+        ];
+        echo $OUTPUT->render_from_template('mod_seal/viewstudenttwo', $templatecontext);
+    }
+    else
+    {
+        $templatecontext = (object)[
+            'wallet' => $userview->wallethash,
+            'signature' => $userview->signaturehash,
+            'ipfs' => $userview->ipfs,
+            'url' => $userview->url,
+        ];
+        echo $OUTPUT->render_from_template('mod_seal/viewstudentend', $templatecontext);
+    }
 }
 
 echo $OUTPUT->footer();

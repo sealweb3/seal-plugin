@@ -28,6 +28,13 @@
  * @param string $feature Constant representing the feature.
  * @return true | null True if the feature is supported, null otherwise.
  */
+require_once(__DIR__.'/../../config.php');
+
+if (isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['userid'])) {
+    $userid = required_param('userid', PARAM_INT);
+    delete_user_wallet($userid);
+}
+
 function seal_supports($feature) {
     switch ($feature) {
         case FEATURE_MOD_INTRO:
@@ -79,8 +86,24 @@ function seal_update_instance($moduleinstance, $mform = null) {
     $nonteachers = array_filter($enrolledusers, function($user) use ($context) {
         return !has_capability('moodle/course:manageactivities', $context, $user->id);
     });
-    var_dump($nonteachers);
-    die;
+    foreach ($nonteachers as $user) {
+        $walletid = 'wallet_' . $user->id;
+        if (isset($moduleinstance->{$walletid})) {
+            $walletdata = $moduleinstance->{$walletid};
+
+            // Insert or update the wallet information in your `seal_user` table
+            $walletrecord = $DB->get_record('seal_user', array('iduser' => $user->id));
+            if ($walletrecord) {
+                $walletrecord->wallet = $walletdata;
+                $DB->update_record('seal_user', $walletrecord);
+            } else {
+                $newrecord = new stdClass();
+                $newrecord->iduser = $user->id;
+                $newrecord->wallet = $walletdata;
+                $DB->insert_record('seal_user', $newrecord);
+            }
+        }
+    }
 
     return $DB->update_record('seal', $moduleinstance);
 }
@@ -102,4 +125,24 @@ function seal_delete_instance($id) {
     $DB->delete_records('seal', array('id' => $id));
 
     return true;
+}
+
+function delete_user_wallet($userid) {
+    global $DB, $COURSE;
+
+    // Validar que el usuario tenga permisos para eliminar.
+    $context = context_course::instance($COURSE->id);
+    require_capability('moodle/course:manageactivities', $context);
+    
+    $userview = $DB->get_record('seal_user', array('iduser' => $userid));
+        if($userview && !empty((array)$userview)){
+            // Eliminar el registro de la base de datos.
+            $DB->delete_records('seal_user', array('id' => $userview->id));
+
+        }
+
+    // Redireccionar de vuelta a la página principal o de configuración.
+    //var_dump($COURSE);
+    //die;
+    redirect(new moodle_url('/course/view.php', ['id' => $COURSE->id]), 'Wallet eliminado exitosamente');
 }

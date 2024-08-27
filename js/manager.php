@@ -27,21 +27,30 @@ try {
         throw new Exception('Missing required data');
     }
 
-    if ($action === 'student') {
+    if ($action === 'manager') {
+/*
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, 'https://adjusted-weekly-cattle.ngrok-free.app/certificate/certify');
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $postData = [
+            'message' => $singMessage,
+            'hashMessage' => $hashMesssage,
+            'signature' => $signature,
+            'address' => $userAddress,
+        ];
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+*///         'accept: */*',
+ /*        'Content-Type: multipart/form-data',
+        ]);
 
-        $moduleinstance->timecreated = time();
-        $moduleinstance->iduser = $USER->id;
-        $moduleinstance->course = $COURSE->id;
-        $moduleinstance->wallethash = $userAddress;
-        $moduleinstance->signaturehash = $signature;
+        // Ejecuta la solicitud y almacena la respuesta
+        $responsedata = curl_exec($ch);
 
-        $userview = $DB->get_record('seal_user', array('iduser' => $USER->id));
-        if($userview && !empty((array)$userview)){
-            $DB->delete_records('seal_user', array('id' => $userview->id));
+        set_config('isAuthorized', $responsedata->isAuthorized, 'mod_seal');
+        */
 
-        }
-
-        $id = $DB->insert_record('seal_user', $moduleinstance);
 
         //pensar en un foreach para insertar todos
 
