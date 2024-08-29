@@ -60,16 +60,6 @@ function seal_add_instance($moduleinstance, $mform = null) {
     return $id;
 }
 
-/**
- * Updates an instance of the mod_seal in the database.
- *
- * Given an object containing all the necessary data (defined in mod_form.php),
- * this function will update an existing instance with new data.
- *
- * @param object $moduleinstance An object from the form in mod_form.php.
- * @param mod_seal_mod_form $mform The form.
- * @return bool True if successful, false otherwise.
- */
 function seal_update_instance($moduleinstance, $mform = null) {
     global $DB;
 
@@ -79,12 +69,7 @@ function seal_update_instance($moduleinstance, $mform = null) {
     return $DB->update_record('seal', $moduleinstance);
 }
 
-/**
- * Removes an instance of the mod_seal from the database.
- *
- * @param int $id Id of the module instance.
- * @return bool True if successful, false on failure.
- */
+
 function seal_delete_instance($id) {
     global $DB;
 
@@ -99,20 +84,12 @@ function seal_delete_instance($id) {
 }
 
 
-/**
- * Fetch nonce from an external API.
- *
- * @param string $userAddress The user address.
- * @return string The nonce.
- * @throws moodle_exception If the API call fails or the response is invalid.
- */
 function fetch_nonce_from_api($userAddress) {
     global $CFG;
     require_once($CFG->libdir . '/filelib.php'); // Ensure the core curl class is included
 
     $ch = curl_init();
     $url = 'http://192.46.223.247:4000/auth/getNonce/' . urlencode($userAddress);
-    error_log('URL: ' . $url);
 
     curl_setopt($ch, CURLOPT_URL, $url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -135,38 +112,75 @@ function fetch_nonce_from_api($userAddress) {
     return $response;
 }
 
-
-
 function send_data_to_external_api($nonce, $userAddress, $fullMessage, $signature) {
-    // $url = 'https://run.mocky.io/v3/cd8d2524-e7db-4ad6-8a3f-dd765864048b'; // FALSE,false
-    // $url = 'https://run.mocky.io/v3/5835b23c-bd0e-46fc-8800-2e450efd96cf'; // TRUE,false
-    // $url = 'https://run.mocky.io/v3/45129c60-a1b3-4a12-b3ab-cf4df423ce81'; // TRUE,true
-// 
-    $data = array('nonce' => $nonce, 'userAddress' => $userAddress, 'fullMessage' => $fullMessage, 'signature' => $signature);
-    $options = array(
-        'http' => array(
-            'header'  => "Content-Type: application/json\r\n",
-            'method'  => 'POST',
-            'content' => json_encode($data),
-        ),
-    );
-    $url = 'http://192.46.223.247:4000/auth/installPlugin';
-    $context  = stream_context_create($options);
-    $result = file_get_contents($url, false, $context);
-    error_log("API Response: " . $result);
+    global $CFG;
+    require_once($CFG->libdir . '/filelib.php');
 
-    if ($result === FALSE) {
-        $errorMessage = 'Error sending data to external API';
-        error_log($errorMessage);
-        throw new Exception($errorMessage);
+    $data = array('nonce' => $nonce, 'address' => $userAddress, 'message' => $fullMessage, 'signature' => $signature);
+    error_log("DATA: " . json_encode($data));
+
+    $url = 'http://192.46.223.247:4000/auth/login';
+    $curl = new curl();
+    $curl->setHeader('Content-Type: application/json');
+    $response = $curl->post($url, json_encode($data));
+
+    error_log("API Response: " . $response);
+
+    if ($curl->errno != CURLE_OK) {
+        throw new moodle_exception('error:api_request_failed', 'mod_seal', '', $curl->error);
     }
 
-    $response = json_decode($result, true);
+    $decoded_response = json_decode($response, true);
     if (json_last_error() !== JSON_ERROR_NONE) {
-        $errorMessage = 'Invalid JSON response from external API';
-        error_log($errorMessage);
-        throw new Exception($errorMessage);
+        throw new moodle_exception('error:invalid_json_response', 'mod_seal');
     }
 
-    return $response;
+    return $decoded_response;
+}
+
+function create_attestation($data, $schemaId) {
+    $attestationInfo = json_encode([
+        'schemaId' => $schemaId,
+        'data' => $data,
+        'indexingValue' => "",
+        'recipients' => ['0x92388d12744B418eFac8370B266D31fd9C4c5F0e'],
+        'validUntil' => 0
+    ]);
+
+    // This is where you'd normally call delegateSignAttestation
+    // For now, we'll simulate its response
+    $info = [
+        'attestation' => json_decode($attestationInfo, true),
+        'delegationSignature' => 'simulated_signature'
+    ];
+
+    return $info;
+}
+
+function send_attestation($attestationDto) {
+    global $CFG;
+    require_once($CFG->libdir . '/filelib.php');
+
+    $url = 'http://192.46.223.247:4000/attestations/attestOrganizationInDelegationMode';
+    $jwt_token = 'your_jwt_token_here'; // Replace with actual JWT token
+
+    $curl = new curl();
+    $curl->setHeader([
+        'Accept: application/json',
+        'Authorization: Bearer ' . $jwt_token,
+        'Content-Type: application/json'
+    ]);
+
+    $response = $curl->post($url, json_encode($attestationDto));
+
+    if ($curl->errno != CURLE_OK) {
+        throw new Exception('Error sending attestation: ' . $curl->error);
+    }
+
+    $decoded_response = json_decode($response, true);
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        throw new Exception('Invalid JSON response from attestation API');
+    }
+
+    return $decoded_response;
 }

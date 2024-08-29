@@ -14,16 +14,7 @@ if (empty($userAddress)) {
 }
 
 try {
-    // Log the user address for debugging
-    error_log("Fetching nonce for user address: $userAddress");
-
-    // Fetch the nonce from the external API
     $nonce = fetch_nonce_from_api($userAddress);
-
-    // Log the nonce for debugging
-    error_log("Fetched nonce: $nonce");
-
-    // Return the nonce as a JSON response
     echo json_encode(['nonce' => $nonce]);
 } catch (Exception $e) {
     // Log the error for debugging

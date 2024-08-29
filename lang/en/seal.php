@@ -68,7 +68,6 @@ $string['enable_certificates'] = 'Please fill this form to enable the generation
 $string['disconnect_button'] = 'Disconnect Wallet';
 $string['verified'] = 'To see your certificates, please follow this link:';
 $string['adressList'] = 'Managers Wallets';
-$string['adressList_desc'] = 'Enter one wallet address per line.';
 $string['agree_terms'] = 'Agree to Terms and Conditions';
 $string['agree_terms_desc'] = 'By clicking this button, you agree to the terms and conditions.';
 $string['dropdown_section'] = 'Dropdown Section';
@@ -77,6 +76,6 @@ $string['wallet'] = 'Wallet';
 $string['sealname_help'] = 'Enter the name of the certification';
 $string['usersneed'] = 'users wallet for attestation';
 $string['attestation_button'] = 'Attestation';
-
+$string['adressList_format'] = 'Enter wallet addresses separated by commas (e.g., 0x123...,0x456...,0x789...)';
 
 

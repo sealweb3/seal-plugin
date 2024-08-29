@@ -33,6 +33,7 @@ module.exports = {
     new webpack.DefinePlugin({
       'process.env.PRIVATE_KEY': JSON.stringify(process.env.PRIVATE_KEY),
       'process.env.JWT_TOKEN': JSON.stringify(process.env.JWT_TOKEN),
+      'process.env.COOKIE_NAME_TOKEN': JSON.stringify(process.env.COOKIE_NAME_TOKEN),
     }),
   ],
   resolve: {

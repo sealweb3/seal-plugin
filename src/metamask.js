@@ -1,5 +1,10 @@
 import { SiweMessage } from 'siwe';
-import { ethers } from 'ethers'; // Import utils from ethers
+import { ethers } from 'ethers'; 
+import Cookies from 'js-cookie';
+import { ensureEnvVar } from './helpers';
+import axios from 'axios';
+
+const cookieNameToken = ensureEnvVar(process.env.COOKIE_NAME_TOKEN, 'COOKIE_NAME_TOKEN');
 
 document.addEventListener('DOMContentLoaded', () => {
     const config = {
@@ -74,9 +79,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.log('Full message:', fullMessage);
 
                 const signature = await signer.signMessage(fullMessage);
-                const response = await sendDataToServer(nonce, userAddress, fullMessage, signature);
+                await login(nonce, userAddress, fullMessage, signature);
+                const profilesAndAuthorizations = await getProfilesAndAuthorizations(userAddress);
+
+
                 await sendResponseToSettings(response);
-                updateView();
+                // updateView();
 
             } catch (error) {
                 console.error('Error during MetaMask interaction:', error);
@@ -104,19 +112,36 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    async function sendDataToServer(nonce, userAddress, fullMessage, signature) {
-        console.log('Sending to server:', nonce, userAddress, fullMessage, signature);
+    async function login(nonce, userAddress, fullMessage, signature) {
         try {
-            const response = await fetch('/mod/seal/sendvalidation.php', { 
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ nonce, userAddress, fullMessage, signature }),
-            });
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
+            const userDto = {
+                nonce: nonce,
+                address: userAddress,
+                message: fullMessage,
+                signature: signature
             }
-            const data = await response.json();
-            return data;
+            const response = await axios.post('http://192.46.223.247:4000/auth/login', userDto);
+            const stringifiedToken = JSON.stringify(response.data);
+            Cookies.set(cookieNameToken, stringifiedToken, { expires: 365 });
+        } catch (error) {
+            console.error('Error sending data to server:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    async function getProfilesAndAuthorizations(address) {
+
+        try {
+            const token = JSON.parse(Cookies.get(cookieNameToken));
+            console.log('Token:', token);
+            const response = await axios.get(`http://192.46.223.247:4000/profiles/getProfilesAndIsAuthorized/${address}`, {
+                headers: {
+                    'Authorization': `Bearer ${token.access_token}`
+                }
+            });
+            const profilesAndAuthorizations = response.data;
+            console.log('Profiles and authorizations:', profilesAndAuthorizations);
+            return profilesAndAuthorizations;
         } catch (error) {
             console.error('Error sending data to server:', error);
             return { success: false, error: error.message };
