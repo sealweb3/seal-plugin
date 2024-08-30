@@ -100,3 +100,5 @@ $string['name'] = 'Name';
 $string['url'] = 'URL';
 $string['select'] = 'Select';
 $string['managertitle'] = 'Certificate student';
+$string['batch'] = 'Image by NFT';
+$string['image'] = 'Base image certificate';

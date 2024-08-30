@@ -34,7 +34,6 @@
             <th>{{#str}}wallet, mod_seal{{/str}}</th>
             <th>{{#str}}percentage, mod_seal{{/str}}</th>
             <th>{{#str}}aprobe, mod_seal{{/str}}</th>
-            <th>{{#str}}delete, mod_seal{{/str}}</th>
         </tr>
     </thead>
     <tbody>
@@ -45,8 +44,6 @@
             <td>{{wallet}}</td>
             <td>{{percentage}}</td>
             <td>{{aprobe}}</td>
-            <td><a href="lib.php?userid={{id}}&action=delete" onclick="return confirm('¿Está seguro de que desea eliminar este usuario?');" id="{{id}}"><i class="icon fa fa-trash fa-fw " title="Delete" role="img" aria-label="Delete"></i></a>
-            </td>
         </tr>
         {{/table}}
     </tbody>

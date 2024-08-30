@@ -8,8 +8,9 @@ dotenv.config();
 module.exports = {
   mode: 'development', // Set the mode to 'development' or 'production'
   entry: {
-    attestation: './src/attestation.js',
-    metamask: './src/metamask.js', // Add your second entry file here
+    //attestation: './src/attestation.js',
+    //metamask: './src/metamask.js', // Add your second entry file here
+    web3manager: './js/web3manager.js', //add file certified by manager
   },
   output: {
     filename: '[name].bundle.js', // This will generate attestation.bundle.js and siweTest.bundle.js

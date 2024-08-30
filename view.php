@@ -57,7 +57,7 @@ $PAGE->set_context($modulecontext);
 echo $OUTPUT->header();
 
 if(has_capability('moodle/site:config',$modulecontext)){
-    $PAGE->requires->js(new moodle_url('/mod/seal/js/web3manager.js'));
+    $PAGE->requires->js(new moodle_url('/mod/seal/dist/web3manager.bundle.js'));
     $users = $DB->get_records('seal_user', array('course' => $COURSE->id));
 
     // Convertir el objeto de usuarios en un array.

@@ -63,6 +63,27 @@ function seal_add_instance($moduleinstance, $mform = null) {
 
     $id = $DB->insert_record('seal', $moduleinstance);
 
+    //insert images batch and certificate
+/*
+    $context = context_module::instance($moduleinstance->coursemodule);
+    $draftitemid = $mform->get_new_filename('batchfile');
+    if ($draftitemid) {
+        $batchfilename = file_save_draft_area_files($draftitemid, $context->id, 'mod_seal', 'batch', 0, array('subdirs' => 0, 'maxfiles' => 1));
+        $moduleinstance->batch = $batchfilename;
+    }
+
+    // Handle ipfs file upload
+    $draftitemid = $mform->get_new_filename('imagefile');
+    if ($draftitemid) {
+        $imagefilename = file_save_draft_area_files($draftitemid, $context->id, 'mod_seal', 'image', 0, array('subdirs' => 0, 'maxfiles' => 1));
+        $moduleinstance->image = $imagefilename;
+    }
+
+    // Update record with filenames
+    $DB->update_record('seal', $moduleinstance);
+
+*/
+
     return $id;
 }
 
@@ -81,6 +102,8 @@ function seal_update_instance($moduleinstance, $mform = null) {
 
     $moduleinstance->timemodified = time();
     $moduleinstance->id = $moduleinstance->instance;
+    /*
+    //código para agregar wallet por el manager 
     $context = context_course::instance($COURSE->id);
     $enrolledusers = get_enrolled_users($context);
     $nonteachers = array_filter($enrolledusers, function($user) use ($context) {
@@ -103,8 +126,25 @@ function seal_update_instance($moduleinstance, $mform = null) {
                 $DB->insert_record('seal_user', $newrecord);
             }
         }
-    }
+    }*/
 
+    $context = context_module::instance($moduleinstance->coursemodule);
+
+    // Manejo de archivos de batch
+    $batchdraftitemid = $mform->get_new_filename('batchfile');
+    if ($batchdraftitemid) {
+        // Guardar archivo desde el área de borrador
+        file_save_draft_area_files($batchdraftitemid, $context->id, 'mod_seal', 'batch', $moduleinstance->id, array('subdirs' => 0, 'maxfiles' => 1));
+        $moduleinstance->batch = $batchdraftitemid;
+    }
+/*
+    // Manejo de archivos de imagen
+    $imagefile = $mform->save_stored_file('imagefile', $context->id, 'mod_seal', 'image', $moduleinstance->id, array('subdirs' => 0, 'maxfiles' => 1));
+    if ($imagefile) {
+        // Limpiar el nombre del archivo antes de guardarlo en la base de datos
+        $moduleinstance->image = clean_param($imagefile->get_filename(), PARAM_FILE);
+    }
+*/
     return $DB->update_record('seal', $moduleinstance);
 }
 
@@ -145,4 +185,108 @@ function delete_user_wallet($userid) {
     //var_dump($COURSE);
     //die;
     redirect(new moodle_url('/course/view.php', ['id' => $COURSE->id]), 'Wallet eliminado exitosamente');
+}
+
+
+// function attest
+
+function fetch_nonce_from_api($userAddress) {
+    global $CFG;
+    require_once($CFG->libdir . '/filelib.php'); // Ensure the core curl class is included
+
+    $ch = curl_init();
+    $url = 'http://192.46.223.247:4000/auth/getNonce/' . urlencode($userAddress);
+
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+    $response = curl_exec($ch);
+
+    if ($response === false) {
+        $errorMessage = 'Failed to fetch nonce from external API: ' . curl_error($ch);
+        error_log($errorMessage);
+        curl_close($ch);
+        throw new moodle_exception($errorMessage);
+    }
+    curl_close($ch);
+    error_log('DATA: ' . $response);
+    if (!$response) {
+        $errorMessage = 'Invalid response from external API';
+        error_log($errorMessage);
+        throw new moodle_exception($errorMessage);
+    }
+    return $response;
+}
+
+function send_data_to_external_api($nonce, $userAddress, $fullMessage, $signature) {
+    global $CFG;
+    require_once($CFG->libdir . '/filelib.php');
+
+    $data = array('nonce' => $nonce, 'address' => $userAddress, 'message' => $fullMessage, 'signature' => $signature);
+    error_log("DATA: " . json_encode($data));
+
+    $url = 'http://192.46.223.247:4000/auth/login';
+    $curl = new curl();
+    $curl->setHeader('Content-Type: application/json');
+    $response = $curl->post($url, json_encode($data));
+
+    error_log("API Response: " . $response);
+
+    if ($curl->errno != CURLE_OK) {
+        throw new moodle_exception('error:api_request_failed', 'mod_seal', '', $curl->error);
+    }
+
+    $decoded_response = json_decode($response, true);
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        throw new moodle_exception('error:invalid_json_response', 'mod_seal');
+    }
+
+    return $decoded_response;
+}
+
+function create_attestation($data, $schemaId) {
+    $attestationInfo = json_encode([
+        'schemaId' => $schemaId,
+        'data' => $data,
+        'indexingValue' => "",
+        'recipients' => ['0x92388d12744B418eFac8370B266D31fd9C4c5F0e'],
+        'validUntil' => 0
+    ]);
+
+    // This is where you'd normally call delegateSignAttestation
+    // For now, we'll simulate its response
+    $info = [
+        'attestation' => json_decode($attestationInfo, true),
+        'delegationSignature' => 'simulated_signature'
+    ];
+
+    return $info;
+}
+
+function send_attestation($attestationDto) {
+    global $CFG;
+    require_once($CFG->libdir . '/filelib.php');
+
+    $url = 'http://192.46.223.247:4000/attestations/attestOrganizationInDelegationMode';
+    $jwt_token = 'your_jwt_token_here'; // Replace with actual JWT token
+
+    $curl = new curl();
+    $curl->setHeader([
+        'Accept: application/json',
+        'Authorization: Bearer ' . $jwt_token,
+        'Content-Type: application/json'
+    ]);
+
+    $response = $curl->post($url, json_encode($attestationDto));
+
+    if ($curl->errno != CURLE_OK) {
+        throw new Exception('Error sending attestation: ' . $curl->error);
+    }
+
+    $decoded_response = json_decode($response, true);
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        throw new Exception('Invalid JSON response from attestation API');
+    }
+
+    return $decoded_response;
 }

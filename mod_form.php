@@ -54,6 +54,8 @@ class mod_seal_mod_form extends moodleform_mod {
             {
                 $mform = $this->_form;
 
+                /* 
+                //código donde aparecen usuarios para que el manager los ingrese
                 if ($this->_instance) {
                     $mform->addElement('header', 'users', get_string('users', 'mod_seal'));
                     
@@ -79,7 +81,7 @@ class mod_seal_mod_form extends moodleform_mod {
                             $mform->addElement('html', '<div>'.$userall.' '.$walUser->wallet.'</div>');                    
                         }
                     }
-                }
+                }*/
             
                 // Adding the "general" fieldset, where all the common settings are shown.
                 $mform->addElement('header', 'general', get_string('certificate', 'mod_seal'));
@@ -96,6 +98,12 @@ class mod_seal_mod_form extends moodleform_mod {
                 $mform->addRule('name', null, 'required', null, 'client');
                 $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
                 $mform->addHelpButton('name', 'sealname', 'mod_seal');
+
+                $mform->addElement('filepicker', 'batchfile', get_string('batch', 'mod_seal'), null, array('accepted_types' => array('image'), 'maxfiles' => 1));
+                //$mform->addRule('batchfile', null, 'required', null, 'client');
+
+                //$mform->addElement('filepicker', 'imagefile', get_string('image', 'mod_seal'), null, array('accepted_types' => array('.jpg', '.png', '.jpeg'), 'maxfiles' => 1));
+                //$mform->addRule('imagefile', null, 'required', null, 'client');
                 
                 // Adding the standard "intro" and "introformat" fields.
                 if ($CFG->branch >= 29) {
