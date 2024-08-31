@@ -82,9 +82,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 await login(nonce, userAddress, fullMessage, signature);
                 const profilesAndAuthorizations = await getProfilesAndAuthorizations(userAddress);
 
-
-                await sendResponseToSettings(response);
-                // updateView();
+                await sendResponseToSettings(profilesAndAuthorizations);
+                updateView();
 
             } catch (error) {
                 console.error('Error during MetaMask interaction:', error);
@@ -120,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 message: fullMessage,
                 signature: signature
             }
-            const response = await axios.post('http://192.46.223.247:4000/auth/login', userDto);
+            const response = await axios.post(`${process.env.BASE_URL}/auth/login`, userDto);
             const stringifiedToken = JSON.stringify(response.data);
             Cookies.set(cookieNameToken, stringifiedToken, { expires: 365 });
         } catch (error) {
@@ -130,11 +129,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function getProfilesAndAuthorizations(address) {
-
         try {
             const token = JSON.parse(Cookies.get(cookieNameToken));
             console.log('Token:', token);
-            const response = await axios.get(`http://192.46.223.247:4000/profiles/getProfilesAndIsAuthorized/${address}`, {
+            const response = await axios.get(`${process.env.BASE_URL}/profiles/getProfilesAndIsAuthorized/${address}`, {
                 headers: {
                     'Authorization': `Bearer ${token.access_token}`
                 }
@@ -156,11 +154,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ action: 'reset' }),
             });
-    
             if (!response.ok) {
                 throw new Error('Network response was not ok');
-            }
-    
+            }   
             const text = await response.text();
             let result;
             try {
@@ -168,7 +164,6 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch (e) {
                 throw new Error('Failed to parse JSON response: ' + text);
             }
-    
             if (result.status === 'success') {
                 console.log('Authorization reset successfully:', result.message);
                 location.reload(); 
@@ -190,7 +185,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateView() {
     console.log('Updating view');
         setTimeout(() => {
-            location.reload(); // Reload the page to update the view
-        }, 1000); // 
+            location.reload(); 
+        }, 1000); 
     }
 });

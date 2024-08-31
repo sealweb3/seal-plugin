@@ -77,5 +77,13 @@ $string['sealname_help'] = 'Enter the name of the certification';
 $string['usersneed'] = 'users wallet for attestation';
 $string['attestation_button'] = 'Attestation';
 $string['adressList_format'] = 'Enter wallet addresses separated by commas (e.g., 0x123...,0x456...,0x789...)';
+$string['view_terms'] = 'View Terms and Conditions';
+$string['terms_and_conditions'] = 'Terms and Conditions';
+$string['terms_content'] = 'This is a placeholder for the SEAL module terms and conditions. Please replace this content with your actual terms and conditions.
 
+1. Usage of the SEAL module is subject to these terms.
+2. Users must agree to these terms before using the module.
+3. The module collects and processes data as described in our privacy policy.
+4. Users are responsible for their actions within the module.
+5. These terms may be updated periodically.';
 

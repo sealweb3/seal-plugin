@@ -10,7 +10,7 @@ async function getSchema() {
   try {
     const token = JSON.parse(Cookies.get(cookieNameToken));
     
-    const response = await axios.get('http://192.46.223.247:4000/schemas/getSchemaIdByType/organization', {
+    const response = await axios.get(`${process.env.BASE_URL}/schemas/getSchemaIdByType/organization`, {
       headers: {
         'Accept': 'application/json',
         'Authorization': `Bearer ${token.access_token}`
@@ -30,7 +30,7 @@ async function getAccreditorAttestationId() {
   try {
     const token = JSON.parse(Cookies.get(cookieNameToken));
 
-    const response = await axios.get('http://192.46.223.247:4000/attestations/getAccreditorAttestationId', {
+    const response = await axios.get(`${process.env.BASE_URL}/attestations/getAccreditorAttestationId`, {
       headers: {
         'Accept': 'application/json',
         'Authorization': `Bearer ${token.access_token}`
@@ -76,7 +76,6 @@ async function createAttestation(data, schemaId) {
 }
 
 document.addEventListener('DOMContentLoaded', async function() {
-  
   document.getElementById('attestationButton').addEventListener('click', async function() {
     try {
       const schemaResponse = await getSchema();
@@ -109,8 +108,8 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
       };
 
-      console.log('Simplified DTO:', JSON.stringify(simplifiedDto, null, 2));
-      const url = `http://192.46.223.247:4000/attestations/attestOrganizationInDelegationMode`;
+      // console.log('Simplified DTO:', JSON.stringify(simplifiedDto, null, 2));
+      const url = `${process.env.BASE_URL}/attestations/attestOrganizationInDelegationMode`;
       let jwtToken = process.env.JWT_TOKEN;
       try { 
         const response = await axios.post(url, simplifiedDto, {

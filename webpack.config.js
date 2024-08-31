@@ -34,6 +34,7 @@ module.exports = {
       'process.env.PRIVATE_KEY': JSON.stringify(process.env.PRIVATE_KEY),
       'process.env.JWT_TOKEN': JSON.stringify(process.env.JWT_TOKEN),
       'process.env.COOKIE_NAME_TOKEN': JSON.stringify(process.env.COOKIE_NAME_TOKEN),
+      'process.env.BASE_URL': JSON.stringify(process.env.BASE_URL),
     }),
   ],
   resolve: {

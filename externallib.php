@@ -1,6 +1,4 @@
 
-php
-Copiar código
 <?php
 // This file is part of Moodle - https://moodle.org/
 //
