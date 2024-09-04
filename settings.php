@@ -28,7 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once(__DIR__.'/externallib.php');
 global $DB;
 
-$PAGE->requires->js(new moodle_url('/mod/seal/dist/metamask2.bundle.js'));
+$PAGE->requires->js(new moodle_url('/mod/seal/dist/metamask.bundle.js'));
 
 $isAuthorized = get_config('mod_seal', 'isAuthorized');
 $name = get_config('mod_seal', 'name');
@@ -97,7 +97,7 @@ else if ($isAuthorized == '0' && $name == ''){
         echo '";var institutionWallets = "';
         echo get_config('mod_seal', 'adressList');
         echo '";</script>';
-        $PAGE->requires->js(new moodle_url('/mod/seal/dist/attestation2.bundle.js'));
+        $PAGE->requires->js(new moodle_url('/mod/seal/dist/attestation.bundle.js'));
         debugging('Form submitted and sesskey confirmed.');
         //$profileid=mod_seal_external::attestation_organization();
         //set_config('profileId', $profileid, 'mod_seal');

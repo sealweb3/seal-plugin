@@ -174,7 +174,6 @@ async function handleManagerButtonClick(button) {
             const dataCertify = await fetch(`./getdata.php?courseid=${encodeURIComponent(courseId)}`);
             const dataCerti = await dataCertify.json();
             const dataAttestation = createAttestationStudent(schemaCourse, dataCerti, schemaOrganization);
-            console.log('Data:', dataCerti);
             console.log('DataAttestation:', dataAttestation);
 
         } catch (error) {

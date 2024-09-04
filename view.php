@@ -90,7 +90,7 @@ if ($file2) {
 echo $OUTPUT->header();
 
 if(has_capability('moodle/site:config',$modulecontext)){
-    $PAGE->requires->js(new moodle_url('/mod/seal/dist/web3manager3.bundle.js'));
+    $PAGE->requires->js(new moodle_url('/mod/seal/dist/web3manager.bundle.js'));
         // Mostrar la imagen
     if ($file) {
         echo '<img src="' . $fileurl . '" alt="Batch Image" height="250">';
