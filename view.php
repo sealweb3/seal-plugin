@@ -46,6 +46,9 @@ if ($id) {
 
 require_login($course, true, $cm);
 
+echo '<script type="text/javascript">var courseId = ';
+echo json_encode($course->id);
+echo '</script>';
 
 $modulecontext = context_module::instance($cm->id);
 
@@ -54,11 +57,52 @@ $PAGE->set_title(format_string($moduleinstance->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($modulecontext);
 
+$fs = get_file_storage();
+
+// Recuperar el archivo guardado
+$file = $fs->get_file($modulecontext->id, 'mod_seal', 'batch', $moduleinstance->id, '/', $moduleinstance->batch);
+$file2 = $fs->get_file($modulecontext->id, 'mod_seal', 'image', $moduleinstance->id, '/', $moduleinstance->image);
+
+if ($file) {
+    // Construir la URL para servir el archivo correctamente a través de Moodle
+    $fileurl = moodle_url::make_pluginfile_url(
+        $file->get_contextid(),
+        $file->get_component(),
+        $file->get_filearea(),
+        $file->get_itemid(),
+        $file->get_filepath(),
+        $file->get_filename()
+    );
+}
+
+if ($file2) {
+    // Construir la URL para servir el archivo correctamente a través de Moodle
+    $fileurl2 = moodle_url::make_pluginfile_url(
+        $file2->get_contextid(),
+        $file2->get_component(),
+        $file2->get_filearea(),
+        $file2->get_itemid(),
+        $file2->get_filepath(),
+        $file2->get_filename()
+    );
+}
+
 echo $OUTPUT->header();
 
 if(has_capability('moodle/site:config',$modulecontext)){
-    $PAGE->requires->js(new moodle_url('/mod/seal/dist/web3manager.bundle.js'));
-    $users = $DB->get_records('seal_user', array('course' => $COURSE->id));
+    $PAGE->requires->js(new moodle_url('/mod/seal/dist/web3manager3.bundle.js'));
+        // Mostrar la imagen
+    if ($file) {
+        echo '<img src="' . $fileurl . '" alt="Batch Image" height="250">';
+    } else {
+        echo 'Archivo no encontrado';
+    }
+    if ($file2) {
+        echo '<img src="' . $fileurl2 . '" alt="Cer Image" height="250">';
+    } else {
+        echo 'Archivo no encontrado';
+    }
+    $users = $DB->get_records('seal_user', array('course' => $course->id));
 
     // Convertir el objeto de usuarios en un array.
     $usersArray = [];

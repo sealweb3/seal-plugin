@@ -15,17 +15,31 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Plugin version and other meta-data are defined here.
+ * Code to be executed after the plugin's database scheme has been installed is defined here.
  *
  * @package     mod_seal
+ * @category    upgrade
  * @copyright   2024 Pablo Vesga <pablovesga@outlook.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+/**
+ * Custom code to be run on installing the plugin.
+ */
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'mod_seal';
-$plugin->release = '0.1.1';
-$plugin->version = 2024070200;
-$plugin->requires = 2022112800;
-$plugin->maturity = MATURITY_ALPHA;
+function xmldb_seal_upgrade($oldversion) {
+    global $CFG;
+
+    // Automatically generated Moodle v3.9.0 release upgrade line.
+    // Put any upgrade step following this.
+
+    // Automatically generated Moodle v4.0.0 release upgrade line.
+    // Put any upgrade step following this.
+
+    // Automatically generated Moodle v4.1.0 release upgrade line.
+    // Put any upgrade step following this.
+
+    return true;
+}
+

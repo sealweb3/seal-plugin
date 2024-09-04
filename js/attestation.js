@@ -1,0 +1,137 @@
+import axios from 'axios';
+import { EvmChains, delegateSignAttestation } from '@ethsign/sp-sdk';
+import Cookies from 'js-cookie';
+import { ensureEnvVar } from './helpers';
+import { ethers } from 'ethers';
+
+const cookieNameToken = ensureEnvVar(process.env.COOKIE_NAME_TOKEN, 'COOKIE_NAME_TOKEN');
+
+async function getSchema() {
+  try {
+    const token = JSON.parse(Cookies.get(cookieNameToken));
+    
+    const response = await axios.get(`http://192.46.223.247:4000/schemas/getSchemaIdByType/organization`, {
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${token.access_token}`
+      }
+    });
+
+    const schemaId = response.data;
+    
+    return schemaId;
+  } catch (error) {
+    console.error('Failed to fetch schema:', error.response ? error.response.data : error.message);
+    throw error;
+  }
+}
+
+async function getAccreditorAttestationId() {
+  try {
+    const token = JSON.parse(Cookies.get(cookieNameToken));
+
+    const response = await axios.get(`http://192.46.223.247:4000/attestations/getAccreditorAttestationId`, {
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${token.access_token}`
+      }
+    });
+    const accreditatorAttestationId = response.data;
+
+    return accreditatorAttestationId;
+  } catch (error) {
+    console.error('Failed to fetch schema:', error.response ? error.response.data : error.message);
+    throw error;
+  }
+}
+
+async function createAttestation(data, schemaId) {
+  try {
+    const ethereum = window.ethereum
+		const provider = new ethers.BrowserProvider(
+			ethereum
+		)
+    const signer = await provider.getSigner()
+    const address = await signer.getAddress()
+
+    const attestationInfo = {
+      schemaId: schemaId,
+      data: data,
+      indexingValue: "",
+      recipients: [address],
+      validUntil: 0
+    };
+    const info = await delegateSignAttestation(
+      attestationInfo,
+      {
+        chain: EvmChains.arbitrumSepolia,
+      }
+    )
+
+    return info;
+  } catch (error) {
+    console.error('Error creating attestation:', error);
+    throw error;
+  }
+}
+
+document.addEventListener('DOMContentLoaded', async function() {
+  console.log('Attestation JS loaded correctly.');  // Añadir esta línea para comprobar
+  try {
+    const schemaResponse = await getSchema();
+    console.log('Schema:', schemaResponse);
+    
+    const accreditatorAttestationId = await getAccreditorAttestationId();
+    console.log('acreditator:', accreditatorAttestationId);
+    
+    const data = {
+      name: institutionName,
+      description: institutionDescription,
+      website: institutionWebsite,
+      linkedAttestationId: accreditatorAttestationId
+    };  
+    
+    let info = await createAttestation(data, schemaResponse);
+    console.log('info attestation:', info);
+    const url = `http://192.46.223.247:4000/attestations/attestOrganizationInDelegationMode`;
+    console.log('url: ', url)
+    
+    if (!info || !info.attestation || !info.delegationSignature) {
+        throw new Error('Invalid attestation response structure');
+    }
+        
+    let simplifiedDto = {
+      attestationDto: info.attestation,
+      signatureDto: info.delegationSignature,
+      profileDto: {
+        name: institutionName,
+        managers: institutionWallets.split(',').map(wallet => wallet.trim())
+      }
+    };
+            
+    console.log('Simplified DTO:', JSON.stringify(simplifiedDto, null, 2));
+    let jwtToken = process.env.JWT_TOKEN;
+    try { 
+      const response = await axios.post(url, simplifiedDto, {
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${jwtToken}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      console.log('Response: ', response);    
+    } catch (error) {
+      console.error('Error sending attestation:', error.response ? error.response.data : error.message);
+    }
+    updateView();
+  } catch (error) {
+    console.error('Error in attestation process:', error);
+  }
+
+  function updateView() {
+    console.log('Updating view');
+        setTimeout(() => {
+            location.reload(); 
+        }, 30000); 
+    }
+});

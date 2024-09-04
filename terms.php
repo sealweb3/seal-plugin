@@ -15,17 +15,25 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Plugin version and other meta-data are defined here.
+ * Prints an instance of mod_seal.
  *
  * @package     mod_seal
  * @copyright   2024 Pablo Vesga <pablovesga@outlook.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+require(__DIR__.'/../../config.php');
 
-$plugin->component = 'mod_seal';
-$plugin->release = '0.1.1';
-$plugin->version = 2024070200;
-$plugin->requires = 2022112800;
-$plugin->maturity = MATURITY_ALPHA;
+require_login();
+
+$PAGE->set_url('/mod/seal/terms.php');
+$PAGE->set_title(get_string('terms_and_conditions', 'seal'));
+$PAGE->set_heading(get_string('terms_and_conditions', 'seal'));
+$PAGE->set_context(context_system::instance());
+
+
+echo $OUTPUT->header();
+
+echo '<p>' . get_string('terms_content', 'seal') . '</p>';
+
+echo $OUTPUT->footer();
