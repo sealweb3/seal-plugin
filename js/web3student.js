@@ -67,7 +67,7 @@ async function handleStudentButtonClick(button) {
     //const messageHash = ethers.hashMessage(message); 
     
     try {
-        const response = await fetch(`../mod/seal/js/student.php?courseid=${encodeURIComponent(courseId)}`, { 
+        const response = await fetch(`./js/student.php?courseid=${encodeURIComponent(courseId)}`, { 
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ action, signature, userAddress, singMessage }),

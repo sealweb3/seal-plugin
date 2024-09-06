@@ -75,7 +75,7 @@ function seal_add_instance($moduleinstance, $mform = null) {
         $context->id,         // El contexto del módulo
         'mod_seal',           // El componente
         'batch',              // El área de archivo destino
-        $moduleinstance->id,  // El ID del elemento (id del registro)
+        $id,  // El ID del elemento (id del registro)
         array('subdirs' => 0, 'maxfiles' => 1) // Opciones de guardado
     );
 
@@ -90,7 +90,7 @@ function seal_add_instance($moduleinstance, $mform = null) {
         $context->id,         // El contexto del módulo
         'mod_seal',           // El componente
         'image',              // El área de archivo destino
-        $moduleinstance->id,  // El ID del elemento (id del registro)
+        $id,  // El ID del elemento (id del registro)
         array('subdirs' => 0, 'maxfiles' => 1) // Opciones de guardado
     );
 
@@ -98,6 +98,7 @@ function seal_add_instance($moduleinstance, $mform = null) {
     if ($draftitem2id) {
         $moduleinstance->image = $mform->get_new_filename('imagefile');
     }
+    $moduleinstance->id=$id;
     $DB->update_record('seal', $moduleinstance);
 
     return $id;
