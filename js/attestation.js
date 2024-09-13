@@ -10,7 +10,7 @@ async function getSchema() {
   try {
     const token = JSON.parse(Cookies.get(cookieNameToken));
     
-    const response = await axios.get(`http://192.46.223.247:4000/schemas/getSchemaIdByType/organization`, {
+    const response = await axios.get(`${url}/schemas/getSchemaIdByType/organization`, {
       headers: {
         'Accept': 'application/json',
         'Authorization': `Bearer ${token.access_token}`
@@ -30,7 +30,7 @@ async function getAccreditorAttestationId() {
   try {
     const token = JSON.parse(Cookies.get(cookieNameToken));
 
-    const response = await axios.get(`http://192.46.223.247:4000/attestations/getAccreditorAttestationId`, {
+    const response = await axios.get(`${url}/attestations/getAccreditorAttestationId`, {
       headers: {
         'Accept': 'application/json',
         'Authorization': `Bearer ${token.access_token}`
@@ -77,6 +77,7 @@ async function createAttestation(data, schemaId) {
 
 document.addEventListener('DOMContentLoaded', async function() {
   console.log('Attestation JS loaded correctly.');  // Añadir esta línea para comprobar
+  institutionName = "nuevo nombre";
   try {
     const schemaResponse = await getSchema();
     console.log('Schema:', schemaResponse);
@@ -93,8 +94,8 @@ document.addEventListener('DOMContentLoaded', async function() {
     
     let info = await createAttestation(data, schemaResponse);
     console.log('info attestation:', info);
-    const url = `http://192.46.223.247:4000/attestations/attestOrganizationInDelegationMode`;
-    console.log('url: ', url)
+    const url2 = `${url}/attestations/attestOrganizationInDelegationMode`;
+    console.log('url: ', url2)
     
     if (!info || !info.attestation || !info.delegationSignature) {
         throw new Error('Invalid attestation response structure');
@@ -112,7 +113,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     console.log('Simplified DTO:', JSON.stringify(simplifiedDto, null, 2));
     let jwtToken = process.env.JWT_TOKEN;
     try { 
-      const response = await axios.post(url, simplifiedDto, {
+      const response = await axios.post(url2, simplifiedDto, {
         headers: {
           'Accept': 'application/json',
           'Authorization': `Bearer ${jwtToken}`,

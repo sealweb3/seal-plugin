@@ -28,5 +28,5 @@ echo $isAuthorized;
 echo " BR ";
 echo $name;
 
-set_config('isAuthorized', '0', 'mod_seal');
-set_config('name', 'SEAL', 'mod_seal');
+set_config('isAuthorized', '', 'mod_seal');
+set_config('name', '', 'mod_seal');

@@ -21,7 +21,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const metamaskButton = document.getElementById('metamaskButton');
-    const disconnectButton = document.getElementById('disconnectButton');
 
     function createSiweMessage(address, nonce) {
         const message = new SiweMessage({
@@ -43,16 +42,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     } 
 
-    if (disconnectButton) {
-        disconnectButton.addEventListener('click', async function() {
-            handleDisconnectButtonClick();
-        });
-    } 
-
     async function handleMetaMaskButtonClick(button) {
         button.disabled = true;
         button.textContent = config.messages.processing;
         button.classList.add('disabledButton');
+        
     
         if (typeof window.ethereum !== 'undefined') {
             const ethereum = window.ethereum;
@@ -130,7 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 message: fullMessage,
                 signature: signature
             }
-            const response = await axios.post('http://192.46.223.247:4000/auth/login', userDto);
+            const response = await axios.post(`${url}/auth/login`, userDto);
             const stringifiedToken = JSON.stringify(response.data);
             Cookies.set(cookieNameToken, stringifiedToken, { expires: 365 });
         } catch (error) {
@@ -143,7 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const token = JSON.parse(Cookies.get(cookieNameToken));
             console.log('Token:', token);
-            const response = await axios.get(`http://192.46.223.247:4000/profiles/getProfilesAndIsAuthorized/${address}`, {
+            const response = await axios.get(`${url}/profiles/getProfilesAndIsAuthorized/${address}`, {
                 headers: {
                     'Authorization': `Bearer ${token.access_token}`
                 }
@@ -154,35 +148,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error('Error sending data to server:', error);
             return { success: false, error: error.message };
-        }
-    }
-
-    async function handleDisconnectButtonClick() {
-        console.log('Disconnecting wallet');
-        try {
-            const response = await fetch('/mod/seal/settings.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'reset' }),
-            });
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }   
-            const text = await response.text();
-            let result;
-            try {
-                result = JSON.parse(text);
-            } catch (e) {
-                throw new Error('Failed to parse JSON response: ' + text);
-            }
-            if (result.status === 'success') {
-                console.log('Authorization reset successfully:', result.message);
-                location.reload(); 
-            } else {
-                console.error('Failed to reset authorization:', result.message);
-            }
-        } catch (error) {
-            console.error('Error during disconnect:', error);
         }
     }
 

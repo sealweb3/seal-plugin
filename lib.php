@@ -75,7 +75,7 @@ function seal_add_instance($moduleinstance, $mform = null) {
         $context->id,         // El contexto del módulo
         'mod_seal',           // El componente
         'batch',              // El área de archivo destino
-        $id,  // El ID del elemento (id del registro)
+        $moduleinstance->id,  // El ID del elemento (id del registro)
         array('subdirs' => 0, 'maxfiles' => 1) // Opciones de guardado
     );
 
@@ -90,7 +90,7 @@ function seal_add_instance($moduleinstance, $mform = null) {
         $context->id,         // El contexto del módulo
         'mod_seal',           // El componente
         'image',              // El área de archivo destino
-        $id,  // El ID del elemento (id del registro)
+        $moduleinstance->id,  // El ID del elemento (id del registro)
         array('subdirs' => 0, 'maxfiles' => 1) // Opciones de guardado
     );
 
@@ -98,7 +98,6 @@ function seal_add_instance($moduleinstance, $mform = null) {
     if ($draftitem2id) {
         $moduleinstance->image = $mform->get_new_filename('imagefile');
     }
-    $moduleinstance->id=$id;
     $DB->update_record('seal', $moduleinstance);
 
     return $id;
@@ -206,7 +205,7 @@ function fetch_nonce_from_api($userAddress) {
     require_once($CFG->libdir . '/filelib.php'); // Ensure the core curl class is included
 
     $ch = curl_init();
-    $url = 'http://192.46.223.247:4000/auth/getNonce/' . urlencode($userAddress);
+    $url = get_config('mod_seal', 'url').'/auth/getNonce/' . urlencode($userAddress);
 
     curl_setopt($ch, CURLOPT_URL, $url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -236,7 +235,7 @@ function send_data_to_external_api($nonce, $userAddress, $fullMessage, $signatur
     $data = array('nonce' => $nonce, 'address' => $userAddress, 'message' => $fullMessage, 'signature' => $signature);
     error_log("DATA: " . json_encode($data));
 
-    $url = 'http://192.46.223.247:4000/auth/login';
+    $url = get_config('mod_seal', 'url').'/auth/login';
     $curl = new curl();
     $curl->setHeader('Content-Type: application/json');
     $response = $curl->post($url, json_encode($data));
@@ -278,7 +277,7 @@ function send_attestation($attestationDto) {
     global $CFG;
     require_once($CFG->libdir . '/filelib.php');
 
-    $url = 'http://192.46.223.247:4000/attestations/attestOrganizationInDelegationMode';
+    $url = get_config('mod_seal', 'url').'/attestations/attestOrganizationInDelegationMode';
     $jwt_token = 'your_jwt_token_here'; // Replace with actual JWT token
 
     $curl = new curl();

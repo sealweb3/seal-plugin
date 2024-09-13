@@ -34,7 +34,14 @@ $isAuthorized = get_config('mod_seal', 'isAuthorized');
 $name = get_config('mod_seal', 'name');
 $profileid = get_config('mod_seal', 'profileid');
 $agree = get_config('mod_seal', 'agree_terms');
-//set_config('name', '', 'mod_seal');
+
+set_config('url', 'https://9acc-2600-3c04-00-f03c-94ff-fe6d-53e8.ngrok-free.app', 'mod_seal'); //servidor quemado revisar código para cambiarlo
+
+$url = get_config('mod_seal', 'url');
+echo '<script type="text/javascript">var url = "';
+echo get_config('mod_seal', 'url');
+echo '";';
+echo '</script>';
 if($isAuthorized == ''){
     $settings->add(new admin_setting_heading('uno', get_string('settings_start', 'seal'), ''));
     $settings->add(new admin_setting_description('seal/wallet_button', '', '<button type="button" class="btn btn-primary" id="metamaskButton">' . get_string('wallet_button', 'seal') . '</button>'));

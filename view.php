@@ -46,9 +46,6 @@ if ($id) {
 
 require_login($course, true, $cm);
 
-echo '<script type="text/javascript">var courseId = ';
-echo json_encode($course->id);
-echo '</script>';
 
 $modulecontext = context_module::instance($cm->id);
 
@@ -86,6 +83,20 @@ if ($file2) {
         $file2->get_filename()
     );
 }
+
+echo '<script type="text/javascript">var courseId = ';
+echo json_encode($course->id);
+echo ';';
+echo 'var file1 = "';
+echo $fileurl;
+echo '";';
+echo 'var file2 = "';
+echo $fileurl2;
+echo '";';
+echo 'var url = "';
+echo get_config('mod_seal', 'url');
+echo '";';
+echo '</script>';
 
 echo $OUTPUT->header();
 
