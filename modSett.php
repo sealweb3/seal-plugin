@@ -19,14 +19,16 @@ require_login();
 
 global $DB, $COURSE;
 
-$isAuthorized = get_config('mod_seal', 'isAuthorized');
 $name = get_config('mod_seal', 'name');
 $profileid = get_config('mod_seal', 'profileid');
 $agree = get_config('mod_seal', 'agree_terms');
 
-echo $isAuthorized;
-echo " BR ";
-echo $name;
+echo '<p>isAuthorized:'.get_config('mod_seal', 'isAuthorized').'</p>';
+echo '<p>profileid:'.get_config('mod_seal', 'profileid').'</p>';
+echo '<p>url:'.get_config('mod_seal', 'url').'</p>';
+echo '<p>name:'.get_config('mod_seal', 'name').'</p>';
 
 set_config('isAuthorized', '', 'mod_seal');
-set_config('name', '', 'mod_seal');
+//set_config('name', '', 'mod_seal');
+set_config('url', '', 'mod_seal');
+

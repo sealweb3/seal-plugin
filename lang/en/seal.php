@@ -70,7 +70,7 @@ $string['enable_certificates'] = 'Please fill this form to enable the generation
 $string['disconnect_button'] = 'Disconnect Wallet';
 $string['verified'] = 'To see your certificates, please follow this link:';
 $string['adressList'] = 'Wallet Addresses';
-$string['adressList_desc'] = 'Enter one wallet address per line.';
+$string['adressList_desc'] = 'Enter one wallet address separete by commas.';
 $string['agree_terms'] = 'Agree to Terms and Conditions';
 $string['agree_terms_desc'] = 'By clicking this button, you agree to the terms and conditions.';
 $string['dropdown_section'] = 'Dropdown Section';
@@ -93,7 +93,7 @@ $string['teachertitle'] = 'Student ready to certificate';
 $string['student'] = 'Student';
 $string['description_student'] = 'Here you should upload your wallet in which the attestation will be carried out and your nft will be sent to you. Once loaded, verify that it is correct.';
 $string['download_student'] = 'To download your certificate click on url.';
-$string['description_student_wallet'] = 'verify that your wallet is correct. In this your NFT will be uploaded and the attestation will be carried out. At this moment you are in the certification process. Once you are certified you will be able to see your certificate.';
+$string['description_student_wallet'] = 'Verify that your wallet is correct. In this your NFT will be uploaded and the attestation will be carried out. At this moment you are in the certification process. Once you are certified you will be able to see your certificate.';
 $string['signature'] = 'Signature';
 $string['ipfs'] = 'IPFS';
 $string['name'] = 'Name';
@@ -111,3 +111,6 @@ $string['terms_content'] = 'This is a placeholder for the SEAL module terms and 
 3. The module collects and processes data as described in our privacy policy.
 4. Users are responsible for their actions within the module.
 5. These terms may be updated periodically.';
+$string['url_label'] = 'Server';
+$string['url_desc'] = 'Identify server that use';
+$string['profileid'] = 'ID Profile';

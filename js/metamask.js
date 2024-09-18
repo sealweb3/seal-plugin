@@ -89,10 +89,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     async function sendResponseToSettings(data) {
+        console.log('data:', data)
         const authori = data[0];
         const profile = data[1];
-        console.log('primer valor:', authori); 
-        console.log('segundo valor:', profile); 
         
         try {
             const response = await fetch('/moodle/mod/seal/js/web3.php', { 
@@ -139,6 +138,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('Token:', token);
             const response = await axios.get(`${url}/profiles/getProfilesAndIsAuthorized/${address}`, {
                 headers: {
+                    'ngrok-skip-browser-warning': 'true',
                     'Authorization': `Bearer ${token.access_token}`
                 }
             });
@@ -162,6 +162,6 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('Updating view');
         setTimeout(() => {
             location.reload(); 
-        }, 30000); 
+        }, 500); 
     }
 });

@@ -32,17 +32,30 @@ $PAGE->requires->js(new moodle_url('/mod/seal/dist/metamask.bundle.js'));
 
 $isAuthorized = get_config('mod_seal', 'isAuthorized');
 $name = get_config('mod_seal', 'name');
-$profileid = get_config('mod_seal', 'profileid');
-$agree = get_config('mod_seal', 'agree_terms');
-
-set_config('url', 'https://9acc-2600-3c04-00-f03c-94ff-fe6d-53e8.ngrok-free.app', 'mod_seal'); //servidor quemado revisar código para cambiarlo
-
 $url = get_config('mod_seal', 'url');
 echo '<script type="text/javascript">var url = "';
 echo get_config('mod_seal', 'url');
 echo '";';
 echo '</script>';
-if($isAuthorized == ''){
+if(get_config('mod_seal', 'url')=='')
+{
+    $settings->add(new admin_setting_heading('uno', get_string('settings_start', 'seal'), ''));
+    $otra = new moodle_url('/mod/seal/pix/seal-logo.jpg');
+    $templatecontext = (object)[
+        'var1' => $otra,
+    ];
+    $settings->add(new admin_setting_description('seal/intro_screen', '', $OUTPUT->render_from_template('mod_seal/setting_one', $templatecontext))); 
+    $settings->add(new admin_setting_configselect('mod_seal/url',
+        get_string('url_label', 'seal'), 
+        get_string('url_desc', 'seal'), 
+        'http://192.46.223.247:4000',  // Valor predeterminado: primera URL
+        array(
+            'https://192.46.223.247:4000' => 'http',  // Primera opción
+            'https://bafb-2600-3c04-00-f03c-94ff-fe6d-53e8.ngrok-free.app' => 'https',  // Segunda opción
+        )
+    ));
+}
+else if($isAuthorized == ''){
     $settings->add(new admin_setting_heading('uno', get_string('settings_start', 'seal'), ''));
     $settings->add(new admin_setting_description('seal/wallet_button', '', '<button type="button" class="btn btn-primary" id="metamaskButton">' . get_string('wallet_button', 'seal') . '</button>'));
     $otra = new moodle_url('/mod/seal/pix/seal-logo.jpg');
@@ -50,6 +63,15 @@ if($isAuthorized == ''){
         'var1' => $otra,
     ];
     $settings->add(new admin_setting_description('seal/intro_screen', '', $OUTPUT->render_from_template('mod_seal/setting_one', $templatecontext))); 
+    $settings->add(new admin_setting_configselect('mod_seal/url',
+        get_string('url_label', 'seal'), 
+        get_string('url_desc', 'seal'), 
+        'http://192.46.223.247:4000',  // Valor predeterminado: primera URL
+        array(
+            'http://192.46.223.247:4000' => 'http',  // Primera opción
+            'https://bafb-2600-3c04-00-f03c-94ff-fe6d-53e8.ngrok-free.app' => 'https',  // Segunda opción
+        )
+    ));
 }
 else if ($isAuthorized == '0' && $name == ''){
     $settings->add(new admin_setting_heading('uno', get_string('settings_Unlicensed', 'seal'), ''));
@@ -60,40 +82,49 @@ else if ($isAuthorized == '0' && $name == ''){
     ];
         $settings->add(new admin_setting_description('seal/intro_screen', '', $OUTPUT->render_from_template('mod_seal/setting_two', $templatecontext)));
 
-    }
-    else if ($isAuthorized == '0' && $name != ''){
-        $PAGE->requires->js(new moodle_url('/mod/seal/js/setting.js'));
-        $settings->add(new admin_setting_heading('uno', get_string('settings_attestation_enabled', 'seal'), ''));
-        // Nombre de la Entidad
-        $settings->add(new admin_setting_configtext('mod_seal/name', get_string('entityname', 'seal'), '', '',  PARAM_TEXT));
-        // Descripción de la Entidad
-        $settings->add(new admin_setting_configtextarea('mod_seal/description', get_string('entitydescription', 'seal'), '', '', PARAM_TEXT));
-        //webste
-        $settings->add(new admin_setting_configtext('mod_seal/website', get_string('contactwebsite', 'seal'), '', '', PARAM_URL));
-        
-        $settings->add(new admin_setting_configtextarea('mod_seal/adressList', get_string('adressList', 'seal'), '', '', PARAM_TEXT));
-    }
-    else if ($isAuthorized == '1' && $name == ''){
-        $settings->add(new admin_setting_heading('uno', get_string('enable_certificates', 'seal'), ''));
-        
-        // Nombre de la Entidad
-        $settings->add(new admin_setting_configtext('mod_seal/name', get_string('entityname', 'seal'), '', '', PARAM_TEXT));
-        // Descripción de la Entidad
-        $settings->add(new admin_setting_configtextarea('mod_seal/description', get_string('entitydescription', 'seal'), '', '', PARAM_TEXT));
-        //webste
-        $settings->add(new admin_setting_configtext('mod_seal/website', get_string('contactwebsite', 'seal'), '', '', PARAM_URL));
-        
-        $settings->add(new admin_setting_configtextarea('mod_seal/adressList', get_string('adressList', 'seal'), get_string('adressList_desc', 'seal'), '', PARAM_TEXT));    
-        
-        $terms_url = new moodle_url('/mod/seal/terms.php');
-        $terms_link = html_writer::link($terms_url, get_string('view_terms', 'seal'), ['target' => '_blank']);
-        
-        $settings->add(new admin_setting_configcheckbox('mod_seal/agree_terms', 
-        get_string('agree_terms', 'seal'), 
-        get_string('agree_terms_desc', 'seal') . ' ' . $terms_link, 
-        0
-    ));
+}
+else if ($isAuthorized == '0' && $name != ''){
+    $PAGE->requires->js(new moodle_url('/mod/seal/js/setting.js'));
+    $settings->add(new admin_setting_heading('uno', get_string('settings_attestation_enabled', 'seal'), ''));
+    // Nombre de la Entidad
+    $settings->add(new admin_setting_configtext('mod_seal/name', get_string('entityname', 'seal'), '', '',  PARAM_TEXT));
+    // Descripción de la Entidad
+    $settings->add(new admin_setting_configtextarea('mod_seal/description', get_string('entitydescription', 'seal'), '', '', PARAM_TEXT));
+    //webste
+    $settings->add(new admin_setting_configtext('mod_seal/website', get_string('contactwebsite', 'seal'), '', '', PARAM_URL));
+
+    //$settings->add(new admin_setting_configtext('mod_seal/profid', get_string('profileid', 'seal'), '', '', PARAM_URL));
     
+    $settings->add(new admin_setting_configtextarea('mod_seal/adressList', get_string('adressList', 'seal'), '', '', PARAM_TEXT));
+    
+    $settings->add(new admin_setting_configtextarea('mod_seal/temp', 'temp', '', '', PARAM_TEXT));
+
+    
+
+}
+else if ($isAuthorized == '1' && $name == ''){  //revisar ingreso de managers descripción
+    $settings->add(new admin_setting_heading('uno', get_string('enable_certificates', 'seal'), ''));
+    
+    // Nombre de la Entidad
+    $settings->add(new admin_setting_configtext('mod_seal/name', get_string('entityname', 'seal'), '', '', PARAM_TEXT));
+    // Descripción de la Entidad
+    $settings->add(new admin_setting_configtextarea('mod_seal/description', get_string('entitydescription', 'seal'), '', '', PARAM_TEXT));
+    //webste
+    $settings->add(new admin_setting_configtext('mod_seal/website', get_string('contactwebsite', 'seal'), '', '', PARAM_URL));
+    
+    $settings->add(new admin_setting_configtextarea('mod_seal/adressList', get_string('adressList', 'seal'), get_string('adressList_desc', 'seal'), '', PARAM_TEXT));    
+    
+    $terms_url = new moodle_url('/mod/seal/terms.php');
+    $terms_link = html_writer::link($terms_url, get_string('view_terms', 'seal'), ['target' => '_blank']);
+    
+    $settings->add(new admin_setting_configcheckbox('mod_seal/agree_terms', 
+    get_string('agree_terms', 'seal'), 
+    get_string('agree_terms_desc', 'seal') . ' ' . $terms_link, 
+    0
+    ));
+}
+else {
+
     if ($data = data_submitted() && confirm_sesskey()) {
         echo '<script type="text/javascript">var institutionName = "';
         echo get_config('mod_seal', 'name');
@@ -104,11 +135,16 @@ else if ($isAuthorized == '0' && $name == ''){
         echo '";var institutionWallets = "';
         echo get_config('mod_seal', 'adressList');
         echo '";</script>';
-        $PAGE->requires->js(new moodle_url('/mod/seal/dist/attestation.bundle.js'));
-        debugging('Form submitted and sesskey confirmed.');
-        //$profileid=mod_seal_external::attestation_organization();
-        //set_config('profileId', $profileid, 'mod_seal');
-        //set_config('isAuthorized', '0', 'mod_seal');
+        $PAGE->requires->js(new moodle_url('/mod/seal/dist/attestation.bundle.js'));        
     }
+
+    $settings->add(new admin_setting_heading('uno', get_string('settings_attestation_enabled', 'seal'), ''));
+    // Nombre de la Entidad
+    $settings->add(new admin_setting_configtext('mod_seal/name', get_string('entityname', 'seal'), '', '',  PARAM_TEXT));
+    // Descripción de la Entidad
+    $settings->add(new admin_setting_configtextarea('mod_seal/description', get_string('entitydescription', 'seal'), '', '', PARAM_TEXT));
+    //webste
+    $settings->add(new admin_setting_configtext('mod_seal/website', get_string('contactwebsite', 'seal'), '', '', PARAM_URL));
     
+    $settings->add(new admin_setting_configtextarea('mod_seal/adressList', get_string('adressList', 'seal'), '', '', PARAM_TEXT));
 }

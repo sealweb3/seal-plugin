@@ -27,7 +27,7 @@
 <h1>{{#str}}managertitle, mod_seal{{/str}}</h1>
 <p></p>
 
-<button type="button" class="btn btn-primary" id="managerButton">{{#str}}wallet_button, mod_seal{{/str}}</button>
+<button type="button" class="btn btn-primary" id="managerButton" {{disbut}}>{{#str}}wallet_button, mod_seal{{/str}}</button>
 <p></p>
 
 <table class="generaltable">
@@ -35,7 +35,7 @@
         <tr>
             <th>{{#str}}name, mod_seal{{/str}}</th>
             <th>{{#str}}wallet, mod_seal{{/str}}</th>
-            <th>{{#str}}url, mod_seal{{/str}}</th>
+            <th>{{#str}}certificate, mod_seal{{/str}}</th>
         </tr>
     </thead>
     <tbody>
@@ -43,7 +43,7 @@
         <tr>
             <td>{{name}}</td>
             <td>{{wallet}}</td>
-            <td><a href="{{url}}">{{url}}</a></td>
+            <td>{{certifi}}</a></td>
         </tr>
         {{/table}}
     </tbody>

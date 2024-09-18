@@ -75,9 +75,32 @@ async function createAttestation(data, schemaId) {
   }
 }
 
+async function sendResponseToSetting(profileId) {
+  console.log('porfileId', profileId)
+  try {
+      const response = await fetch('/moodle/mod/seal/js/attestation.php', { 
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ profileId }),
+      });
+
+      const responseText = await response.text();
+      console.log('Raw response from server:', responseText);
+
+      if (!response.ok) {
+          throw new Error('Network response was not ok');
+      }
+
+      return JSON.parse(responseText);
+  } catch (error) {
+      console.error('Error sending data to server:', error);
+      return { success: false, error: error.message };
+  }   
+}
+
 document.addEventListener('DOMContentLoaded', async function() {
   console.log('Attestation JS loaded correctly.');  // Añadir esta línea para comprobar
-  institutionName = "nuevo nombre";
+  institutionName = "Soy SEAL";
   try {
     const schemaResponse = await getSchema();
     console.log('Schema:', schemaResponse);
@@ -120,7 +143,9 @@ document.addEventListener('DOMContentLoaded', async function() {
           'Content-Type': 'application/json'
         }
       });
-      console.log('Response: ', response);    
+      console.log('Response: ', response.data);
+      await sendResponseToSetting(response.data);
+                  
     } catch (error) {
       console.error('Error sending attestation:', error.response ? error.response.data : error.message);
     }

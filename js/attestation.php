@@ -3,7 +3,6 @@ require_once('../../../config.php');
 require_login();
 
 $response = new stdClass();
-global $USER, $DB, $COURSE;
 
 try {
     // Capturar datos de la solicitud
@@ -17,26 +16,21 @@ try {
         throw new Exception('Invalid JSON data: ' . json_last_error_msg());
     }
 
-    $atest = isset($data['atest']) ? $data['atest'] : '';
-    $ids = isset($data['ids']) ? $data['ids'] : '';    
-    $courseId = isset($data['courseNow']) ? $data['courseNow'] : '';    
+    // Depuración de los datos recibidos
+    error_log('Received data: ' . print_r($data, true));
 
-    if (empty($atest) || empty($ids)) {
-        throw new Exception('Missing required data');
+    $profile = isset($data['profileId']) ? $data['profileId'] : null;
+
+    if ($profile === null) {
+        throw new Exception('Missing authorization data');
     }
 
-    foreach ($ids as $iduser) {
-        $user = $DB->get_record('seal_user', array('id' => $iduser));
-        $user->url = $atest;
-        $DB->update_record('seal_user', $user);
-    }
+    // Aquí iría tu lógica para manejar $authorization y $profile
 
-    $seals = $DB->get_record('seal', array('course' => $courseId));
-    $seals->enabled = 0;
-    $DB->update_record('seal', $seals);
+    set_config('profid', $profile, 'mod_seal');   
 
     $response->success = true;
-    $response->id = $id;        
+    $response->message = 'Data processed successfully';
 
 } catch (Exception $e) {
     $response->success = false;
@@ -52,3 +46,4 @@ if (ob_get_contents()) {
 header('Content-Type: application/json');
 echo json_encode($response);
 exit;
+

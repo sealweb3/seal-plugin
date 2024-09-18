@@ -96,12 +96,18 @@ echo '";';
 echo 'var url = "';
 echo get_config('mod_seal', 'url');
 echo '";';
+echo 'var organization = "';
+echo get_config('mod_seal', 'name');
+echo '";';
+echo 'var profileid = "';
+echo get_config('mod_seal', 'profid');
+echo '";';
 echo '</script>';
 
 echo $OUTPUT->header();
 
 if(has_capability('moodle/site:config',$modulecontext)){
-    $PAGE->requires->js(new moodle_url('/mod/seal/dist/web3manager.bundle.js'));
+    $PAGE->requires->js(new moodle_url('/mod/seal/dist/web3manager2.bundle.js'));
         // Mostrar la imagen
     if ($file) {
         echo '<img src="' . $fileurl . '" alt="Batch Image" height="250">';
@@ -114,7 +120,7 @@ if(has_capability('moodle/site:config',$modulecontext)){
         echo 'Archivo no encontrado';
     }
     $users = $DB->get_records('seal_user', array('course' => $course->id));
-
+    $seal =$DB->get_record('seal', array('course' => $course->id));
     // Convertir el objeto de usuarios en un array.
     $usersArray = [];
     foreach ($users as $user) {
@@ -122,14 +128,16 @@ if(has_capability('moodle/site:config',$modulecontext)){
         // Aquí puedes añadir lógica para formatear los datos del usuario si es necesario.
         $usersArray[] = [
             'id' => $user->id,
-            'name' => $nameuser->firstname.' '.$nameuser->lastname,
-            'wallet' => $user->wallethash,
-            'ipfs' => $user->ipfs,
+            'name'    => $nameuser->firstname.' '.$nameuser->lastname,
+            'wallet'  => $user->wallethash,
+            'ipfs'    => $user->ipfs,
+            'certifi' => empty($user->url) ? get_string('no') : get_string('yes'),
         ];
     }
     $templatecontext = (object)[
         'table' => $usersArray,
         'var1' => $COURSE->id,
+        'disbut'  => ($seal->enabled ==0) ? 'disabled' : '',
     ];
     echo $OUTPUT->render_from_template('mod_seal/viewmanager', $templatecontext);
 }
@@ -181,7 +189,7 @@ else
 {
     $userview = $DB->get_record('seal_user', array('iduser' => $USER->id));
     if(!$userview || empty((array)$userview)){
-        $PAGE->requires->js(new moodle_url('/mod/seal/js/web3student.js'));
+        $PAGE->requires->js(new moodle_url('/mod/seal/js/web3student3.js'));
         $otra = "no wallet";
         $templatecontext = (object)[
             'var1' => $otra,
@@ -189,7 +197,7 @@ else
         echo $OUTPUT->render_from_template('mod_seal/viewstudentone', $templatecontext);
     }
     else if(is_null($userview->url)){
-        $PAGE->requires->js(new moodle_url('/mod/seal/js/web3student.js'));
+        $PAGE->requires->js(new moodle_url('/mod/seal/js/web3student3.js'));
         $templatecontext = (object)[
             'wallet' => $userview->wallethash,
             'signature' => $userview->signaturehash,
@@ -198,6 +206,11 @@ else
     }
     else
     {
+        if ($file) {
+            echo '<img src="' . $fileurl . '" alt="Batch Image" height="250">';
+        } else {
+            echo 'Archivo no encontrado';
+        }
         $templatecontext = (object)[
             'wallet' => $userview->wallethash,
             'signature' => $userview->signaturehash,

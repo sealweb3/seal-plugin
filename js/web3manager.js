@@ -15,7 +15,7 @@ async function login(nonce, userAddress, fullMessage, signature) {
           message: fullMessage,
           signature: signature
       }
-      const response = await axios.post('http://192.46.223.247:4000/auth/login', userDto);
+      const response = await axios.post(`${url}/auth/login`, userDto);
       const stringifiedToken = JSON.stringify(response.data);
       Cookies.set(cookieNameToken, stringifiedToken, { expires: 365 });
   } catch (error) {
@@ -29,8 +29,9 @@ async function getSchema(name) {
   try {
     const token = JSON.parse(Cookies.get(cookieNameToken));
     
-    const response = await axios.get(`http://192.46.223.247:4000/schemas/getSchemaIdByType/${name}`, {
+    const response = await axios.get(`${url}/schemas/getSchemaIdByType/${name}`, {
       headers: {
+        'ngrok-skip-browser-warning': 'true',
         'Accept': 'application/json',
         'Authorization': `Bearer ${token.access_token}`
       }
@@ -45,12 +46,13 @@ async function getSchema(name) {
   }
 }
 
-async function getOrganization(name) {
+async function getOrganization(prof) {
   try {
     const token = JSON.parse(Cookies.get(cookieNameToken));
     
-    const response = await axios.get(`http://192.46.223.247:4000/attestations/getOrganizationAttestationIdByOrganizationName/${name}`, {
+    const response = await axios.get(`${url}/profiles/getProfileAttestationIdByProfileId/${prof}`, {
       headers: {
+        'ngrok-skip-browser-warning': 'true',
         'Accept': 'application/json',
         'Authorization': `Bearer ${token.access_token}`
       }
@@ -88,22 +90,6 @@ function createAttestationStudent(schemaId, dataAttes, organizationId) {
   return attestationInfo;
 }
 
-function createAttestationStudentBackend(schemaId, dataAttes, organizationId, info) {
-  const attestation = info.attestation;
-  const delegateSignature = info.delegationSignature;
-  const address = dataAttes.wallets;
-  const names = dataAttes.names;
-  const data = dataAttes.seals;
-  const attestationDto = {
-    attestationDto: attestation,
-    signatureDto: delegateSignature,
-    profileIdDto: "0x1e3090505c7ab5b2e0671e4771063b36dee39de04d41e461ca6858dfbc66bf42",  //todo actualizar información.
-    participants: names,
-    wallets: address,
-  };
-  return attestationDto;
-}
-
 document.addEventListener('DOMContentLoaded', async function() {
   
   const config = {
@@ -139,13 +125,35 @@ document.addEventListener('DOMContentLoaded', async function() {
       console.error('Manager button not found');
   }
 
+  async function sendResponseToView(atest, ids, courseNow) {
+    console.log('atest', atest)
+    try {
+        const response = await fetch('/moodle/mod/seal/js/manager.php', { 
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ atest, ids, courseNow }),
+        });
+
+        const responseText = await response.text();
+        console.log('Raw response from server:', responseText);
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        return JSON.parse(responseText);
+    } catch (error) {
+        console.error('Error sending data to server:', error);
+        return { success: false, error: error.message };
+    }   
+}
+
 async function handleManagerButtonClick(button) {
     button.disabled = true;
     button.textContent = config.messages.processing;
     button.classList.add('disabledButton');
 
     if (typeof window.ethereum !== 'undefined') {
-      console.log("course:", courseId);
       console.log("file1:", file1);
       console.log("file2:", file2);
       
@@ -169,8 +177,8 @@ async function handleManagerButtonClick(button) {
             const fullMessage = createSiweMessage(userAddress, nonce);
             const signature = await signer.signMessage(fullMessage);
             await login(nonce, userAddress, fullMessage, signature);
-            const schemaCourse = await getSchema('course');                                 //arreglar dato quemado
-            const schemaOrganization = await getOrganization('test');                       //arreglar dato quemado
+            const schemaCourse = await getSchema('course');                                 
+            const schemaOrganization = await getOrganization(profileid);                     
             console.log('SchemaOrganization:', schemaOrganization);
             const dataCertify = await fetch(`./getdata.php?courseid=${encodeURIComponent(courseId)}`);
             const dataCerti = await dataCertify.json();
@@ -182,10 +190,8 @@ async function handleManagerButtonClick(button) {
                 chain: EvmChains.arbitrumSepolia,
               }
             )
-            const dataAttestationBackend = createAttestationStudentBackend(schemaCourse, dataCerti, schemaOrganization, info);
             console.log('Info:', info);
-            console.log('DataAttestationBackend:', dataAttestationBackend);
-            const url = `http://192.46.223.247:4000/attestations/attestCourseInDelegationMode`;
+            const urlatest = url+'/attestations/attestCourseInDelegationMode';
             const token = JSON.parse(Cookies.get(cookieNameToken));
             console.log('token:', token);
             const resfile = await fetch(file1);
@@ -208,24 +214,26 @@ async function handleManagerButtonClick(button) {
             const formAttestationCourseDto = new FormData();
             formAttestationCourseDto.append('attestationDto', JSON.stringify(info.attestation));    
             formAttestationCourseDto.append('signatureDto', JSON.stringify(info.delegationSignature));      
-            formAttestationCourseDto.append('profileIdDto', "0x1e3090505c7ab5b2e0671e4771063b36dee39de04d41e461ca6858dfbc66bf42");  //todo arreglar dato
+            formAttestationCourseDto.append('profileIdDto', profileid); 
             formCourseDto.forEach((value, key) => {formAttestationCourseDto.append(key, value)});
             for (let [key, value] of formAttestationCourseDto.entries()) {
               console.log(key, value);
             }
-            
             try { 
-              const response = await axios.post(url, formAttestationCourseDto, {
+              const response = await axios.post(urlatest, formAttestationCourseDto, {
                 headers: {
+                  'ngrok-skip-browser-warning': 'true',
                   'Authorization': `Bearer ${token.access_token}`,
                   'Content-Type': 'multipart/form-data',
                 }
               });
+              console.log('responde attestation: ', response.data);
+              await sendResponseToView(response.data, dataCerti.ids, courseId);
+              updateView();
               
             } catch (error) {
               console.error('Error sending attestation:', error.response ? error.response.data : error.message);
             }
-            console.log('responde attestation: ', response.data);
         } catch (error) {
             console.error('Error during MetaMask interaction:', error);
             resetButton(button);
@@ -241,6 +249,12 @@ function resetButton(button) {
   button.classList.remove('disabledButton');
   button.textContent = config.messages.connectWithMetaMask;
 }
-  
+ 
+function updateView() {
+  console.log('Updating view');
+      setTimeout(() => {
+          location.reload(); 
+      }, 500); 
+  }
   
 });

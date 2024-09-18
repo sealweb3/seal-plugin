@@ -31,8 +31,20 @@ try {
     }
 
     // Aquí iría tu lógica para manejar $authorization y $profile
+
     set_config('isAuthorized', $authorization, 'mod_seal');
+    set_config('name', $profile[0]['name'], 'mod_seal');
+    set_config('description', $profile[0]['description'], 'mod_seal');
+    set_config('website', $profile[0]['website'], 'mod_seal');
+    set_config('profid', $profile[0]["id"], 'mod_seal');   
+    set_config('adressList', json_encode($profile[0]['managers']), 'mod_seal'); 
     
+   
+
+    
+    //Pendiente siguiente versión revisar tema si existe profile[1] como se generaria la ventana de elección. 
+    //También tema si existe profile y authorization es true como sería la ventana de elección,
+
     $response->success = true;
     $response->message = 'Data processed successfully';
 

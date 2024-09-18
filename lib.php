@@ -114,7 +114,7 @@ function seal_add_instance($moduleinstance, $mform = null) {
  * @return bool True if successful, false otherwise.
  */
 function seal_update_instance($moduleinstance, $mform = null) {
-    global $DB;
+    global $DB, $COURSE;
 
     // Actualizar la marca de tiempo de modificación
     $moduleinstance->timemodified = time();
@@ -122,6 +122,26 @@ function seal_update_instance($moduleinstance, $mform = null) {
 
     // Obtener el contexto del módulo
     $context = context_module::instance($moduleinstance->coursemodule);
+
+    $enrolledusers = get_enrolled_users($context);
+    $nonteachers = array_filter($enrolledusers, function($user) use ($context) {
+        return !has_capability('moodle/course:manageactivities', $context, $user->id);
+    });
+    
+    
+    foreach ($nonteachers as $user) {
+        $walletid = 'wallet_' . $user->id;
+        if (isset($moduleinstance->{$walletid})) {
+            $walletdata = $moduleinstance->{$walletid};
+            
+            $newrecord = new stdClass();
+            $newrecord->iduser = $user->id;
+            $newrecord->wallethash = $walletdata;
+            $newrecord->course = $COURSE->id;
+
+            $DB->insert_record('seal_user', $newrecord);
+        }
+    }
 
     // Mover el archivo batch desde el área de borradores al área final
     $draftitemid = file_get_submitted_draft_itemid('batchfile');
@@ -209,6 +229,12 @@ function fetch_nonce_from_api($userAddress) {
 
     curl_setopt($ch, CURLOPT_URL, $url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
+    $headers = [
+        'ngrok-skip-browser-warning: true',
+        'Authorization:' . "81c9f2e5739df1248ef4acada223c21f98364d170af61049d15ad3ef280e5038"  // Enviar el API key como parte de los headers
+    ];
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
     $response = curl_exec($ch);
 
