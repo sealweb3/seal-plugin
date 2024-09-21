@@ -12,8 +12,9 @@ async function getSchema() {
     
     const response = await axios.get(`${url}/schemas/getSchemaIdByType/organization`, {
       headers: {
+        'Ngrok-Skip-Browser-Warning': 'true',
         'Accept': 'application/json',
-        'Authorization': `Bearer ${token.access_token}`
+        'Authorization': `Bearer ${token.accessToken}`
       }
     });
 
@@ -32,8 +33,9 @@ async function getAccreditorAttestationId() {
 
     const response = await axios.get(`${url}/attestations/getAccreditorAttestationId`, {
       headers: {
+        'Ngrok-Skip-Browser-Warning': 'true',
         'Accept': 'application/json',
-        'Authorization': `Bearer ${token.access_token}`
+        'Authorization': `Bearer ${token.accessToken}`
       }
     });
     const accreditatorAttestationId = response.data;
@@ -76,7 +78,7 @@ async function createAttestation(data, schemaId) {
 }
 
 async function sendResponseToSetting(profileId) {
-  console.log('porfileId', profileId)
+  console.log('profileId', profileId)
   try {
       const response = await fetch('/moodle/mod/seal/js/attestation.php', { 
           method: 'POST',
@@ -85,7 +87,7 @@ async function sendResponseToSetting(profileId) {
       });
 
       const responseText = await response.text();
-      console.log('Raw response from server:', responseText);
+      console.log('Raw response from attestation.php:', responseText);
 
       if (!response.ok) {
           throw new Error('Network response was not ok');
@@ -100,7 +102,6 @@ async function sendResponseToSetting(profileId) {
 
 document.addEventListener('DOMContentLoaded', async function() {
   console.log('Attestation JS loaded correctly.');  // Añadir esta línea para comprobar
-  institutionName = "Soy SEAL";
   try {
     const schemaResponse = await getSchema();
     console.log('Schema:', schemaResponse);
@@ -138,13 +139,15 @@ document.addEventListener('DOMContentLoaded', async function() {
     try { 
       const response = await axios.post(url2, simplifiedDto, {
         headers: {
+          'ngrok-skip-browser-warning': 'true',
           'Accept': 'application/json',
           'Authorization': `Bearer ${jwtToken}`,
           'Content-Type': 'application/json'
         }
       });
-      console.log('Response: ', response.data);
-      await sendResponseToSetting(response.data);
+      const profileres = response.data
+      console.log('Response: ', profileres);
+      await sendResponseToSetting(profileres);
                   
     } catch (error) {
       console.error('Error sending attestation:', error.response ? error.response.data : error.message);
@@ -158,6 +161,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     console.log('Updating view');
         setTimeout(() => {
             location.reload(); 
-        }, 30000); 
+        }, 500); 
     }
 });

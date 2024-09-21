@@ -27,8 +27,11 @@ try {
 
     // Aquí iría tu lógica para manejar $authorization y $profile
 
-    set_config('profid', $profile, 'mod_seal');   
-
+    set_config('temp', $profile[0], 'mod_seal');   
+    set_config('profid', $profile['id'], 'mod_seal');   
+    set_config('bantest', 0, 'mod_seal');  
+    set_config('isAuthorized', 0, 'mod_seal');  
+     
     $response->success = true;
     $response->message = 'Data processed successfully';
 

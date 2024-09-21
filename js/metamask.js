@@ -109,7 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
             return JSON.parse(responseText);
         } catch (error) {
-            console.error('Error sending data to server:', error);
+            console.error('Error sending data web3:', error);
             return { success: false, error: error.message };
         }   
     }
@@ -124,10 +124,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 signature: signature
             }
             const response = await axios.post(`${url}/auth/login`, userDto);
+            const token = response.data;
+            if (!token) throw new Error ('error login in');
+            const expiresAtDate = new Date(token.expiresAt*1000);
+            console.log(expiresAtDate);
+
             const stringifiedToken = JSON.stringify(response.data);
-            Cookies.set(cookieNameToken, stringifiedToken, { expires: 365 });
+            Cookies.set(cookieNameToken, stringifiedToken, { 
+                path: '/',
+				expires: expiresAtDate,
+				httpOnly: true,
+				sameSite: 'strict'
+            });
         } catch (error) {
-            console.error('Error sending data to server:', error);
+            console.error('Error sending login:', error);
             return { success: false, error: error.message };
         }
     }
@@ -139,14 +149,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await axios.get(`${url}/profiles/getProfilesAndIsAuthorized/${address}`, {
                 headers: {
                     'ngrok-skip-browser-warning': 'true',
-                    'Authorization': `Bearer ${token.access_token}`
+                    'Authorization': `Bearer ${token.accessToken}`
                 }
             });
             const profilesAndAuthorizations = response.data;
             console.log('Profiles and authorizations:', profilesAndAuthorizations);
             return profilesAndAuthorizations;
         } catch (error) {
-            console.error('Error sending data to server:', error);
+            console.error('Error sending data get Profiles:', error);
             return { success: false, error: error.message };
         }
     }

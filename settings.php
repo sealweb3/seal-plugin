@@ -48,10 +48,10 @@ if(get_config('mod_seal', 'url')=='')
     $settings->add(new admin_setting_configselect('mod_seal/url',
         get_string('url_label', 'seal'), 
         get_string('url_desc', 'seal'), 
-        'http://192.46.223.247:4000',  // Valor predeterminado: primera URL
+        'https://b060-2600-3c04-00-f03c-94ff-fe6d-53e8.ngrok-free.app',  // Valor predeterminado: primera URL
         array(
-            'https://192.46.223.247:4000' => 'http',  // Primera opción
-            'https://bafb-2600-3c04-00-f03c-94ff-fe6d-53e8.ngrok-free.app' => 'https',  // Segunda opción
+            'https://b060-2600-3c04-00-f03c-94ff-fe6d-53e8.ngrok-free.app' => 'Arbitrum Sepolia',  // Primera opción
+            'https://c66f-2600-3c04-00-f03c-94ff-fe6d-53e8.ngrok-free.app' => 'Arbitrum One',  // Segunda opción
         )
     ));
 }
@@ -66,10 +66,10 @@ else if($isAuthorized == ''){
     $settings->add(new admin_setting_configselect('mod_seal/url',
         get_string('url_label', 'seal'), 
         get_string('url_desc', 'seal'), 
-        'http://192.46.223.247:4000',  // Valor predeterminado: primera URL
+        'https://b060-2600-3c04-00-f03c-94ff-fe6d-53e8.ngrok-free.app',  // Valor predeterminado: primera URL
         array(
-            'http://192.46.223.247:4000' => 'http',  // Primera opción
-            'https://bafb-2600-3c04-00-f03c-94ff-fe6d-53e8.ngrok-free.app' => 'https',  // Segunda opción
+            'https://b060-2600-3c04-00-f03c-94ff-fe6d-53e8.ngrok-free.app' => 'Arbitrum Sepolia',  // Primera opción
+            'https://c66f-2600-3c04-00-f03c-94ff-fe6d-53e8.ngrok-free.app' => 'Arbitrum One',  // Segunda opción
         )
     ));
 }
@@ -97,7 +97,7 @@ else if ($isAuthorized == '0' && $name != ''){
     
     $settings->add(new admin_setting_configtextarea('mod_seal/adressList', get_string('adressList', 'seal'), '', '', PARAM_TEXT));
     
-    $settings->add(new admin_setting_configtextarea('mod_seal/temp', 'temp', '', '', PARAM_TEXT));
+    //$settings->add(new admin_setting_configtextarea('mod_seal/temp', 'temp', '', '', PARAM_TEXT));
 
     
 
@@ -122,10 +122,14 @@ else if ($isAuthorized == '1' && $name == ''){  //revisar ingreso de managers de
     get_string('agree_terms_desc', 'seal') . ' ' . $terms_link, 
     0
     ));
+    if ($data = data_submitted() && confirm_sesskey()) {
+    set_config('bantest', 1, 'mod_seal');   
+                
+    }
 }
 else {
 
-    if ($data = data_submitted() && confirm_sesskey()) {
+    if (get_config('mod_seal', 'bantest')==1) {
         echo '<script type="text/javascript">var institutionName = "';
         echo get_config('mod_seal', 'name');
         echo '";var institutionDescription = "';
@@ -137,7 +141,7 @@ else {
         echo '";</script>';
         $PAGE->requires->js(new moodle_url('/mod/seal/dist/attestation.bundle.js'));        
     }
-
+    $PAGE->requires->js(new moodle_url('/mod/seal/js/setting.js'));
     $settings->add(new admin_setting_heading('uno', get_string('settings_attestation_enabled', 'seal'), ''));
     // Nombre de la Entidad
     $settings->add(new admin_setting_configtext('mod_seal/name', get_string('entityname', 'seal'), '', '',  PARAM_TEXT));

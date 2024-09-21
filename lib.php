@@ -63,6 +63,11 @@ function seal_add_instance($moduleinstance, $mform = null) {
 
     $id = $DB->insert_record('seal', $moduleinstance);
 
+    if (!$id) {
+        throw new moodle_exception('Unable to insert seal instance');
+    }
+
+    $moduleinstance->id = $id; 
     //insert images batch and certificate
 
     // Obtener el contexto del módulo
@@ -139,11 +144,12 @@ function seal_update_instance($moduleinstance, $mform = null) {
             $newrecord->wallethash = $walletdata;
             $newrecord->course = $COURSE->id;
 
-            $DB->insert_record('seal_user', $newrecord);
+            if($walletdata!='')$DB->insert_record('seal_user', $newrecord);
         }
     }
 
     // Mover el archivo batch desde el área de borradores al área final
+    /*
     $draftitemid = file_get_submitted_draft_itemid('batchfile');
     file_save_draft_area_files(
         $draftitemid,         // El ID del área de borradores
@@ -173,7 +179,7 @@ function seal_update_instance($moduleinstance, $mform = null) {
     if ($draftitem2id) {
         $moduleinstance->image = $mform->get_new_filename('imagefile');
     }
-
+    */
     // Guardar el registro actualizado en la base de datos
     return $DB->update_record('seal', $moduleinstance);
 }
@@ -232,7 +238,7 @@ function fetch_nonce_from_api($userAddress) {
     curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
     $headers = [
         'ngrok-skip-browser-warning: true',
-        'Authorization:' . "81c9f2e5739df1248ef4acada223c21f98364d170af61049d15ad3ef280e5038"  // Enviar el API key como parte de los headers
+        'Authorization:'. "81c9f2e5739df1248ef4acada223c21f98364d170af61049d15ad3ef280e5038"  // Enviar el API key como parte de los headers
     ];
     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 

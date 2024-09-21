@@ -30,5 +30,11 @@ function xmldb_seal_install() {
 
     return true;
 }
-
+set_config('isAuthorized', '', 'mod_seal');
+set_config('name', '', 'mod_seal');
+set_config('description', '', 'mod_seal');
+set_config('website', '', 'mod_seal');
+set_config('profid', '', 'mod_seal');   
+set_config('adressList', '', 'mod_seal'); 
+    
 redirect(new moodle_url('/admin/settings.php', array('section' => 'modsettingseal')));

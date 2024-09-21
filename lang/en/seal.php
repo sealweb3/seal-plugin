@@ -36,6 +36,7 @@ $string['sealname'] = 'Name Certify';
 $string['general'] = 'Seal Attestation';
 $string['settings_start'] = 'Please connect to metamask to start';
 $string['wallet_button'] = 'Connect Wallet';
+$string['change_button'] = 'Change Wallet';
 $string['wallet_free_certificates_button'] = 'Get 5 free certificates';
 $string['wallet_button_desc'] = 'Press the button to load the wallet with signature';
 $string['settings_not_enabled'] = 'You do not have a license for the use of the software, to obtain it or to get 5 test certificates contact us at seal@attestation.com';

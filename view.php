@@ -107,7 +107,7 @@ echo '</script>';
 echo $OUTPUT->header();
 
 if(has_capability('moodle/site:config',$modulecontext)){
-    $PAGE->requires->js(new moodle_url('/mod/seal/dist/web3manager2.bundle.js'));
+    $PAGE->requires->js(new moodle_url('/mod/seal/dist/web3manager.bundle.js'));
         // Mostrar la imagen
     if ($file) {
         echo '<img src="' . $fileurl . '" alt="Batch Image" height="250">';
@@ -189,15 +189,15 @@ else
 {
     $userview = $DB->get_record('seal_user', array('iduser' => $USER->id));
     if(!$userview || empty((array)$userview)){
-        $PAGE->requires->js(new moodle_url('/mod/seal/js/web3student3.js'));
-        $otra = "no wallet";
+        $PAGE->requires->js(new moodle_url('/mod/seal/js/web3student.js'));
+        $otra = $course->id;
         $templatecontext = (object)[
             'var1' => $otra,
         ];
         echo $OUTPUT->render_from_template('mod_seal/viewstudentone', $templatecontext);
     }
     else if(is_null($userview->url)){
-        $PAGE->requires->js(new moodle_url('/mod/seal/js/web3student3.js'));
+        $PAGE->requires->js(new moodle_url('/mod/seal/js/web3student.js'));
         $templatecontext = (object)[
             'wallet' => $userview->wallethash,
             'signature' => $userview->signaturehash,

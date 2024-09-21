@@ -33,7 +33,7 @@ async function getSchema(name) {
       headers: {
         'ngrok-skip-browser-warning': 'true',
         'Accept': 'application/json',
-        'Authorization': `Bearer ${token.access_token}`
+        'Authorization': `Bearer ${token.accessToken}`
       }
     });
 
@@ -54,7 +54,7 @@ async function getOrganization(prof) {
       headers: {
         'ngrok-skip-browser-warning': 'true',
         'Accept': 'application/json',
-        'Authorization': `Bearer ${token.access_token}`
+        'Authorization': `Bearer ${token.accessToken}`
       }
     });
 
@@ -223,7 +223,7 @@ async function handleManagerButtonClick(button) {
               const response = await axios.post(urlatest, formAttestationCourseDto, {
                 headers: {
                   'ngrok-skip-browser-warning': 'true',
-                  'Authorization': `Bearer ${token.access_token}`,
+                  'Authorization': `Bearer ${token.accessToken}`,
                   'Content-Type': 'multipart/form-data',
                 }
               });
