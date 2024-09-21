@@ -41,7 +41,7 @@ class mod_seal_mod_form extends moodleform_mod {
     public function definition() {
         $logourl = new moodle_url('/mod/certifieth/pix/seal-logo.svg');
         global $CFG, $DB, $COURSE;
-        $profileId = get_config('mod_seal', 'profileId');
+        $profileId = get_config('mod_seal', 'profid');
         if($profileId=='')
             {
                 $mform = $this->_form;
