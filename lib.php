@@ -243,7 +243,6 @@ function fetch_nonce_from_api($userAddress) {
     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
     $response = curl_exec($ch);
-
     if ($response === false) {
         $errorMessage = 'Failed to fetch nonce from external API: ' . curl_error($ch);
         error_log($errorMessage);

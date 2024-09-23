@@ -4,6 +4,9 @@ require_once($CFG->dirroot . '/mod/seal/lib.php');
 require_login();
 
 header('Content-Type: application/json; charset=utf-8');
+header('Access-Control-Allow-Origin: *');  // Permite solicitudes desde cualquier dominio (útil para CORS)
+header('Access-Control-Allow-Methods: POST, GET, OPTIONS');  // Permite los métodos POST, GET, y OPTIONS
+header('Access-Control-Allow-Headers: Content-Type, Authorization');  // Permite los encabezados de Content-Type y Authorization
 
 $userAddress = required_param('userAddress', PARAM_TEXT);
 

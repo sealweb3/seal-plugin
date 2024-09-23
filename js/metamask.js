@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const userAddress = await signer.getAddress();
 
                 // Fetch nonce from the server using GET
-                const nonceResponse = await fetch(`../mod/seal/getnonce.php?userAddress=${encodeURIComponent(userAddress)}`);
+                const nonceResponse = await fetch(`${dirurl}/getnonce.php?userAddress=${encodeURIComponent(userAddress)}`);
                 if (!nonceResponse.ok) {
                     throw new Error('Failed to fetch nonce');
                 }
@@ -94,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const profile = data[1];
         
         try {
-            const response = await fetch('/moodle/mod/seal/js/web3.php', { 
+            const response = await fetch(`${dirurl}/js/web3.php`, { 
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ authori, profile }),
@@ -133,7 +133,6 @@ document.addEventListener('DOMContentLoaded', () => {
             Cookies.set(cookieNameToken, stringifiedToken, { 
                 path: '/',
 				expires: expiresAtDate,
-				httpOnly: true,
 				sameSite: 'strict'
             });
         } catch (error) {
@@ -172,6 +171,6 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('Updating view');
         setTimeout(() => {
             location.reload(); 
-        }, 500); 
+        }, 30000); 
     }
 });

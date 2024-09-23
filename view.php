@@ -102,6 +102,9 @@ echo '";';
 echo 'var profileid = "';
 echo get_config('mod_seal', 'profid');
 echo '";';
+echo 'var dirurl = "';
+echo new moodle_url('/mod/seal/');;
+echo '";';
 echo '</script>';
 
 echo $OUTPUT->header();

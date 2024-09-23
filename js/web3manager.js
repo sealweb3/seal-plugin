@@ -128,7 +128,7 @@ document.addEventListener('DOMContentLoaded', async function() {
   async function sendResponseToView(atest, ids, courseNow) {
     console.log('atest', atest)
     try {
-        const response = await fetch('/moodle/mod/seal/js/manager.php', { 
+        const response = await fetch(`${dirurl}/js/manager.php`, { 
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ atest, ids, courseNow }),
@@ -168,7 +168,7 @@ async function handleManagerButtonClick(button) {
             const provider = new ethers.BrowserProvider(ethereum);
             const signer = await provider.getSigner();
             const userAddress = await signer.getAddress();
-            const nonceResponse = await fetch(`./getnonce.php?userAddress=${encodeURIComponent(userAddress)}`);
+            const nonceResponse = await fetch(`${dirurl}/getnonce.php?userAddress=${encodeURIComponent(userAddress)}`);
             if (!nonceResponse.ok) {
                 throw new Error('Failed to fetch nonce');
             }
@@ -180,7 +180,8 @@ async function handleManagerButtonClick(button) {
             const schemaCourse = await getSchema('course');                                 
             const schemaOrganization = await getOrganization(profileid);                     
             console.log('SchemaOrganization:', schemaOrganization);
-            const dataCertify = await fetch(`./getdata.php?courseid=${encodeURIComponent(courseId)}`);
+            const dataCertify = await fetch(`${dirurl}/getdata.php?courseid=${encodeURIComponent(courseId)}`);
+            console.log('datacertify:', dataCertify);
             const dataCerti = await dataCertify.json();
             const dataAttestation = createAttestationStudent(schemaCourse, dataCerti, schemaOrganization);
             console.log('DataAttestation:', dataAttestation);
@@ -254,7 +255,7 @@ function updateView() {
   console.log('Updating view');
       setTimeout(() => {
           location.reload(); 
-      }, 500); 
+      }, 30000); 
   }
   
 });

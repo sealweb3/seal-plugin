@@ -36,6 +36,9 @@ $url = get_config('mod_seal', 'url');
 echo '<script type="text/javascript">var url = "';
 echo get_config('mod_seal', 'url');
 echo '";';
+echo 'var dirurl = "';
+echo new moodle_url('/mod/seal/');
+echo '";';
 echo '</script>';
 if(get_config('mod_seal', 'url')=='')
 {

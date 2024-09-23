@@ -80,7 +80,7 @@ async function createAttestation(data, schemaId) {
 async function sendResponseToSetting(profileId) {
   console.log('profileId', profileId)
   try {
-      const response = await fetch('/moodle/mod/seal/js/attestation.php', { 
+      const response = await fetch(`${dirurl}/js/attestation.php`, { 
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ profileId }),

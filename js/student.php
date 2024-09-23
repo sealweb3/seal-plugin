@@ -2,6 +2,12 @@
 require_once('../../../config.php');
 require_login();
 
+header('Content-Type: application/json');  // Aseguramos que la respuesta sea en formato JSON
+header('Access-Control-Allow-Origin: *');  // Permite solicitudes desde cualquier dominio (útil para CORS)
+header('Access-Control-Allow-Methods: POST, GET, OPTIONS');  // Permite los métodos POST, GET, y OPTIONS
+header('Access-Control-Allow-Headers: Content-Type, Authorization');  // Permite los encabezados de Content-Type y Authorization
+
+
 $response = new stdClass();
 global $USER, $DB;
 
@@ -31,6 +37,7 @@ try {
 
     if ($action === 'student') {
 
+        $moduleinstance = new stdClass();
         $moduleinstance->timecreated = time();
         $moduleinstance->iduser = $USER->id;
         $moduleinstance->course = $courseid;
