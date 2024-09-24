@@ -232,13 +232,15 @@ function fetch_nonce_from_api($userAddress) {
 
     $ch = curl_init();
     $url = get_config('mod_seal', 'url').'/auth/getNonce/' . urlencode($userAddress);
+    $api_key = get_config('mod_seal', 'api_key');
+    
 
     curl_setopt($ch, CURLOPT_URL, $url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
     $headers = [
         'ngrok-skip-browser-warning: true',
-        'Authorization:'. "81c9f2e5739df1248ef4acada223c21f98364d170af61049d15ad3ef280e5038"  // Enviar el API key como parte de los headers
+        'Authorization:'. $api_key  // Enviar el API key como parte de los headers
     ];
     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 

@@ -40,6 +40,23 @@ echo 'var dirurl = "';
 echo new moodle_url('/mod/seal/');
 echo '";';
 echo '</script>';
+$environments = array(
+    'https://c860-2600-3c04-00-f03c-94ff-fe6d-53e8.ngrok-free.app' => array(
+        'name' => 'Arbitrum Sepolia',
+        'api_key' => '81c9f2e5739df1248ef4acada223c21f98364d170af61049d15ad3ef280e5038'
+    ),
+    'https://62b0-2600-3c04-00-f03c-94ff-fe6d-53e8.ngrok-free.app' => array(
+        'name' => 'Arbitrum One',
+        'api_key' => 'f84c27e5749e32149f2d9b91409c82e2c34d29a37ae893f9e1947ba2847c5147'
+    ),
+    'https://e9b0-2600-3c04-00-f03c-94ff-fe6d-53e8.ngrok-free.app' => array(
+        'name' => 'CeloMainnet',
+        'api_key' => '91b3b7e5638e00184b4fcac1ad281a03f73a9f87da8b924d93d0b8fa024f4569'
+    )
+);
+foreach ($environments as $url5 => $data) {
+    $combobox_options[$url5] = $data['name'];
+}
 if(get_config('mod_seal', 'url')=='')
 {
     $settings->add(new admin_setting_heading('uno', get_string('settings_start', 'seal'), ''));
@@ -47,18 +64,21 @@ if(get_config('mod_seal', 'url')=='')
     $templatecontext = (object)[
         'var1' => $otra,
     ];
+    $combobox_options = array();
     $settings->add(new admin_setting_description('seal/intro_screen', '', $OUTPUT->render_from_template('mod_seal/setting_one', $templatecontext))); 
     $settings->add(new admin_setting_configselect('mod_seal/url',
         get_string('url_label', 'seal'), 
         get_string('url_desc', 'seal'), 
-        'https://b060-2600-3c04-00-f03c-94ff-fe6d-53e8.ngrok-free.app',  // Valor predeterminado: primera URL
-        array(
-            'https://b060-2600-3c04-00-f03c-94ff-fe6d-53e8.ngrok-free.app' => 'Arbitrum Sepolia',  // Primera opción
-            'https://c66f-2600-3c04-00-f03c-94ff-fe6d-53e8.ngrok-free.app' => 'Arbitrum One',  // Segunda opción
-        )
+        '',  // Valor predeterminado: primera URL
+        $combobox_options
     ));
 }
 else if($isAuthorized == ''){
+    $selected_url = get_config('mod_seal', 'url');
+    if (array_key_exists($selected_url, $environments)) {
+        $api_key = $environments[$selected_url]['api_key'];
+    }
+    set_config('api_key', $api_key, 'mod_seal');    
     $settings->add(new admin_setting_heading('uno', get_string('settings_start', 'seal'), ''));
     $settings->add(new admin_setting_description('seal/wallet_button', '', '<button type="button" class="btn btn-primary" id="metamaskButton">' . get_string('wallet_button', 'seal') . '</button>'));
     $otra = new moodle_url('/mod/seal/pix/seal-logo.jpg');
@@ -69,11 +89,8 @@ else if($isAuthorized == ''){
     $settings->add(new admin_setting_configselect('mod_seal/url',
         get_string('url_label', 'seal'), 
         get_string('url_desc', 'seal'), 
-        'https://b060-2600-3c04-00-f03c-94ff-fe6d-53e8.ngrok-free.app',  // Valor predeterminado: primera URL
-        array(
-            'https://b060-2600-3c04-00-f03c-94ff-fe6d-53e8.ngrok-free.app' => 'Arbitrum Sepolia',  // Primera opción
-            'https://c66f-2600-3c04-00-f03c-94ff-fe6d-53e8.ngrok-free.app' => 'Arbitrum One',  // Segunda opción
-        )
+        $selected_url,  // Valor predeterminado: primera URL
+        $combobox_options
     ));
 }
 else if ($isAuthorized == '0' && $name == ''){
