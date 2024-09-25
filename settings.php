@@ -54,6 +54,8 @@ $environments = array(
         'api_key' => '91b3b7e5638e00184b4fcac1ad281a03f73a9f87da8b924d93d0b8fa024f4569'
     )
 );
+$testurl = 'https://c860-2600-3c04-00-f03c-94ff-fe6d-53e8.ngrok-free.app';
+$combobox_options = array();
 foreach ($environments as $url5 => $data) {
     $combobox_options[$url5] = $data['name'];
 }
@@ -64,17 +66,18 @@ if(get_config('mod_seal', 'url')=='')
     $templatecontext = (object)[
         'var1' => $otra,
     ];
-    $combobox_options = array();
     $settings->add(new admin_setting_description('seal/intro_screen', '', $OUTPUT->render_from_template('mod_seal/setting_one', $templatecontext))); 
     $settings->add(new admin_setting_configselect('mod_seal/url',
         get_string('url_label', 'seal'), 
         get_string('url_desc', 'seal'), 
-        '',  // Valor predeterminado: primera URL
+        $testurl,  // Valor predeterminado: primera URL
         $combobox_options
     ));
 }
 else if($isAuthorized == ''){
     $selected_url = get_config('mod_seal', 'url');
+    if($selected_url==$testurl)set_config('url_student', 'https://main--seal-frontend-vite-test.netlify.app/', 'mod_seal');
+    else set_config('url_student', 'https://sealweb3.com/', 'mod_seal');
     if (array_key_exists($selected_url, $environments)) {
         $api_key = $environments[$selected_url]['api_key'];
     }
@@ -94,6 +97,13 @@ else if($isAuthorized == ''){
     ));
 }
 else if ($isAuthorized == '0' && $name == ''){
+    $selected_url = get_config('mod_seal', 'url');
+    if($selected_url==$testurl)set_config('url_student', 'https://main--seal-frontend-vite-test.netlify.app/', 'mod_seal');
+    else set_config('url_student', 'https://sealweb3.com/', 'mod_seal');
+    if (array_key_exists($selected_url, $environments)) {
+        $api_key = $environments[$selected_url]['api_key'];
+    }
+    set_config('api_key', $api_key, 'mod_seal'); 
     $settings->add(new admin_setting_heading('uno', get_string('settings_Unlicensed', 'seal'), ''));
     $settings->add(new admin_setting_description('seal/wallet_button', '', '<button type="button" class="btn btn-primary" id="metamaskButton">' . get_string('wallet_button', 'seal') . '</button>'));
     $otra = new moodle_url('/mod/seal/pix/seal-logo.jpg');
@@ -101,7 +111,12 @@ else if ($isAuthorized == '0' && $name == ''){
         'var1' => $otra,
     ];
         $settings->add(new admin_setting_description('seal/intro_screen', '', $OUTPUT->render_from_template('mod_seal/setting_two', $templatecontext)));
-
+        $settings->add(new admin_setting_configselect('mod_seal/url',
+        get_string('url_label', 'seal'), 
+        get_string('url_desc', 'seal'), 
+        $testurl,  // Valor predeterminado: primera URL
+        $combobox_options
+    ));
 }
 else if ($isAuthorized == '0' && $name != ''){
     $PAGE->requires->js(new moodle_url('/mod/seal/js/setting.js'));

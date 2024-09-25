@@ -27,7 +27,8 @@ try {
 
     foreach ($ids as $iduser) {
         $user = $DB->get_record('seal_user', array('id' => $iduser));
-        $user->url = $atest;
+        $user->ipfs = $atest;
+        $user->url = get_config('mod_seal', 'url_student');
         $DB->update_record('seal_user', $user);
     }
 
