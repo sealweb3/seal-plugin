@@ -1,21 +1,21 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const config = {
-      messages: {
-          processing: 'Processing...',
-          connectWithMetaMask: 'Connect Wallet',
-          metamaskNotInstalled: 'MetaMask is not installed. Please consider installing it.',
-          connectToMainnet: 'Please connect to the Arbitrum/Sepolia Mainnet',
-          requestFailed: 'Request failed!',
-          disconnectWallet: 'Disconnect Wallet',
-          failedToResetSignature: 'Failed to reset signature',
-          signMessage: 'you must sign a message in your wallet to verify that you are the owner or manager of one account/n/n',
-          verified: 'Verified'
-      }
-  };
+const config = {
+    messages: {
+        processing: 'Processing...',
+        connectWithMetaMask: 'Connect Wallet',
+        metamaskNotInstalled: 'MetaMask is not installed. Please consider installing it.',
+        connectToMainnet: 'Please connect to the '+name_web3,
+        requestFailed: 'Request failed!',
+        disconnectWallet: 'Disconnect Wallet',
+        failedToResetSignature: 'Failed to reset signature',
+        signMessage: 'you must sign a message in your wallet to verify that you are the owner or manager of one account/n/n',
+        verified: 'Verified'
+    }
+};
 
-  const studentButton = document.getElementById('studentButton');
-  
-  if (studentButton) {
+const studentButton = document.getElementById('studentButton');
+
+if (studentButton) {
     studentButton.addEventListener('click', async function() {
         handleStudentButtonClick(this);
     });
@@ -34,7 +34,7 @@ async function handleStudentButtonClick(button) {
         
         try {
             const chainId = await ethereum.request({ method: 'eth_chainId' });
-            if (chainId !== '0x66eee') {
+            if (parseInt(chainId) != var_chain) {
                 alert(config.messages.connectToMainnet);
                 resetButton(button);
                 return;
@@ -62,7 +62,7 @@ async function handleStudentButtonClick(button) {
     }
 }
 
-  async function sendDataToStudent(action, signature = '', userAddress = '', singMessage = '') {
+async function sendDataToStudent(action, signature = '', userAddress = '', singMessage = '') {
     console.log('Sending to server:', action, signature, userAddress, singMessage);
     //const messageHash = ethers.hashMessage(message); 
     
@@ -88,12 +88,12 @@ function resetButton(button) {
     button.textContent = config.messages.connectWithMetaMask;
 }
 
-  function updateView(response) {
-      if (response.success) {
-          location.reload(); // Reload the page to update the view
-      } else {
-          alert(config.messages.requestFailed);
-          resetButton(document.getElementById('metamaskButton'));
-      }const messageHash = ethers.hashMessage(message); 
-  }
+function updateView(response) {
+    if (response.success) {
+        location.reload(); // Reload the page to update the view
+    } else {
+        alert(config.messages.requestFailed);
+        resetButton(document.getElementById('metamaskButton'));
+    }const messageHash = ethers.hashMessage(message); 
+}
 });

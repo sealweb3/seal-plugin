@@ -39,19 +39,34 @@ echo '";';
 echo 'var dirurl = "';
 echo new moodle_url('/mod/seal/');
 echo '";';
+echo 'var var_chain = "';
+echo get_config('mod_seal', 'var_chain');
+echo '";';
+echo 'var name_web3 = "';
+echo get_config('mod_seal', 'name_web3');
+echo '";';
+echo 'var evmchain = "';
+echo get_config('mod_seal', 'evmchain');
+echo '";';
 echo '</script>';
 $environments = array(
     'https://c860-2600-3c04-00-f03c-94ff-fe6d-53e8.ngrok-free.app' => array(
         'name' => 'Arbitrum Sepolia',
-        'api_key' => '81c9f2e5739df1248ef4acada223c21f98364d170af61049d15ad3ef280e5038'
+        'api_key' => '81c9f2e5739df1248ef4acada223c21f98364d170af61049d15ad3ef280e5038',
+        'var_chain' => '0x66eee',
+        'evmchain' => 'arbitrumSepolia'
     ),
     'https://62b0-2600-3c04-00-f03c-94ff-fe6d-53e8.ngrok-free.app' => array(
         'name' => 'Arbitrum One',
-        'api_key' => 'f84c27e5749e32149f2d9b91409c82e2c34d29a37ae893f9e1947ba2847c5147'
+        'api_key' => 'f84c27e5749e32149f2d9b91409c82e2c34d29a37ae893f9e1947ba2847c5147',
+        'var_chain' => '0xa4b1',
+        'evmchain' => 'arbitrumOne'
     ),
     'https://e9b0-2600-3c04-00-f03c-94ff-fe6d-53e8.ngrok-free.app' => array(
         'name' => 'CeloMainnet',
-        'api_key' => '91b3b7e5638e00184b4fcac1ad281a03f73a9f87da8b924d93d0b8fa024f4569'
+        'api_key' => '91b3b7e5638e00184b4fcac1ad281a03f73a9f87da8b924d93d0b8fa024f4569',
+        'var_chain' => '0xa4ec',
+        'evmchain' => 'celoMainnet'
     )
 );
 $testurl = 'https://c860-2600-3c04-00-f03c-94ff-fe6d-53e8.ngrok-free.app';
@@ -80,8 +95,14 @@ else if($isAuthorized == ''){
     else set_config('url_student', 'https://sealweb3.com/', 'mod_seal');
     if (array_key_exists($selected_url, $environments)) {
         $api_key = $environments[$selected_url]['api_key'];
+        $name_web3 = $environments[$selected_url]['name'];
+        $var_chain = $environments[$selected_url]['var_chain'];
+        $evmchain = $environments[$selected_url]['evmchain'];
     }
     set_config('api_key', $api_key, 'mod_seal');    
+    set_config('name_web3', $name_web3, 'mod_seal');    
+    set_config('var_chain', $var_chain, 'mod_seal');    
+    set_config('evmchain', $evmchain, 'mod_seal');    
     $settings->add(new admin_setting_heading('uno', get_string('settings_start', 'seal'), ''));
     $settings->add(new admin_setting_description('seal/wallet_button', '', '<button type="button" class="btn btn-primary" id="metamaskButton">' . get_string('wallet_button', 'seal') . '</button>'));
     $otra = new moodle_url('/mod/seal/pix/seal-logo.jpg');
@@ -102,6 +123,9 @@ else if ($isAuthorized == '0' && $name == ''){
     else set_config('url_student', 'https://sealweb3.com/', 'mod_seal');
     if (array_key_exists($selected_url, $environments)) {
         $api_key = $environments[$selected_url]['api_key'];
+        $name_web3 = $environments[$selected_url]['name'];
+        $var_chain = $environments[$selected_url]['var_chain'];
+        $evmchain = $environments[$selected_url]['evmchain'];
     }
     set_config('api_key', $api_key, 'mod_seal'); 
     $settings->add(new admin_setting_heading('uno', get_string('settings_Unlicensed', 'seal'), ''));

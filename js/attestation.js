@@ -66,7 +66,7 @@ async function createAttestation(data, schemaId) {
     const info = await delegateSignAttestation(
       attestationInfo,
       {
-        chain: EvmChains.arbitrumSepolia,
+        chain: evmchain,
       }
     )
 

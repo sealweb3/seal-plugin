@@ -105,6 +105,15 @@ echo '";';
 echo 'var dirurl = "';
 echo new moodle_url('/mod/seal/');;
 echo '";';
+echo 'var var_chain = "';
+echo get_config('mod_seal', 'var_chain');
+echo '";';
+echo 'var name_web3 = "';
+echo get_config('mod_seal', 'name_web3');
+echo '";';
+echo 'var evmchain = "';
+echo get_config('mod_seal', 'evmchain');
+echo '";';
 echo '</script>';
 
 echo $OUTPUT->header();
