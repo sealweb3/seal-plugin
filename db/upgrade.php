@@ -15,19 +15,31 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Plugin message providers are defined here.
+ * Code to be executed after the plugin's database scheme has been installed is defined here.
  *
- * @package     mod_cer
- * @category    message
+ * @package     mod_seal
+ * @category    upgrade
  * @copyright   2024 Pablo Vesga <pablovesga@outlook.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+/**
+ * Custom code to be run on installing the plugin.
+ */
 defined('MOODLE_INTERNAL') || die();
 
-$messageproviders = [
+function xmldb_seal_upgrade($oldversion) {
+    global $CFG;
 
-    'Suscripcion' => array(
-        'capability' => 'Se le ha terminado los certificados que venias en su paquete. Por favor, mejore o actualice el paquete actual de certificados'
-    ),
-];
+    // Automatically generated Moodle v3.9.0 release upgrade line.
+    // Put any upgrade step following this.
+
+    // Automatically generated Moodle v4.0.0 release upgrade line.
+    // Put any upgrade step following this.
+
+    // Automatically generated Moodle v4.1.0 release upgrade line.
+    // Put any upgrade step following this.
+
+    return true;
+}
+
