@@ -31,4 +31,5 @@ echo '<p>name:'.get_config('mod_seal', 'name').'</p>';
 set_config('isAuthorized', '', 'mod_seal');
 //set_config('name', '', 'mod_seal');
 set_config('url', '', 'mod_seal');
+set_config('program', '', 'mod_seal');
 

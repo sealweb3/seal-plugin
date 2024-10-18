@@ -36,6 +36,7 @@
             <th>{{#str}}name, mod_seal{{/str}}</th>
             <th>{{#str}}wallet, mod_seal{{/str}}</th>
             <th>{{#str}}certificate, mod_seal{{/str}}</th>
+            <th>{{#str}}select, mod_seal{{/str}}</th>
         </tr>
     </thead>
     <tbody>
@@ -43,7 +44,8 @@
         <tr>
             <td>{{name}}</td>
             <td>{{wallet}}</td>
-            <td>{{certifi}}</a></td>
+            <td>{{certifi}}</td>
+            <td><input type="checkbox" name="user_checkbox_{{id}}" value="{{id}}"></td>
         </tr>
         {{/table}}
     </tbody>

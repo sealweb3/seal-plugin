@@ -1,9 +1,9 @@
-import axios from 'axios';
 import { SiweMessage } from 'siwe';
-import { EvmChains, delegateSignAttestation } from '@ethsign/sp-sdk';
+import { ethers } from 'ethers';
 import Cookies from 'js-cookie';
 import { ensureEnvVar } from './helpers';
-import { ethers } from 'ethers';
+import axios from 'axios';
+import { EvmChains, delegateSignAttestation } from '@ethsign/sp-sdk';
 
 const cookieNameToken = ensureEnvVar(process.env.COOKIE_NAME_TOKEN, 'COOKIE_NAME_TOKEN');
 
@@ -46,28 +46,7 @@ async function getSchema(name) {
   }
 }
 
-async function getOrganization(prof) {
-  try {
-    const token = JSON.parse(Cookies.get(cookieNameToken));
-    
-    const response = await axios.get(`${url}/profiles/getProfileAttestationIdByProfileId/${prof}`, {
-      headers: {
-        'ngrok-skip-browser-warning': 'true',
-        'Accept': 'application/json',
-        'Authorization': `Bearer ${token.accessToken}`
-      }
-    });
-
-    const schemaId = response.data;
-    
-    return schemaId;
-  } catch (error) {
-    console.error('Failed to fetch schema:', error.response ? error.response.data : error.message);
-    throw error;
-  }
-}
-
-function createAttestationStudent(schemaId, dataAttes, organizationId) {
+function createAttestationStudent(schemaId, dataAttes) {
   const address = dataAttes.wallets;
   const names = dataAttes.names;
   const data = dataAttes.seals;
@@ -78,7 +57,7 @@ function createAttestationStudent(schemaId, dataAttes, organizationId) {
     duration: data[0].duration,
     location: data[0].location,
     partners: [data[0].partners],
-    linkedAttestationId: organizationId,
+    linkedAttestationId: program,
   };
   const attestationInfo = {
     schemaId: schemaId,
@@ -90,14 +69,14 @@ function createAttestationStudent(schemaId, dataAttes, organizationId) {
   return attestationInfo;
 }
 
-document.addEventListener('DOMContentLoaded', async function() {
+document.addEventListener('DOMContentLoaded', () => {
   
   const config = {
     messages: {
       processing: 'Processing...',
       connectWithMetaMask: 'Connect Wallet',
       metamaskNotInstalled: 'MetaMask is not installed. Please consider installing it.',
-      connectToMainnet: 'Please connect to the Arbitrum/Sepolia Mainnet',
+      connectToMainnet: 'Please connect to the '+name_web3,
     }
   };
 
@@ -110,7 +89,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         statement: 'Seal attestation',
         uri: 'https://sealweb3.com',
         version: '1',
-        chainId: 421614,
+        chainId: var_chain,
         nonce: nonce,
         issuedAt: new Date().toISOString(),
     });
@@ -153,95 +132,114 @@ async function handleManagerButtonClick(button) {
     button.textContent = config.messages.processing;
     button.classList.add('disabledButton');
 
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+    let selectedIds = [];
+
+    // Loop through all the checked checkboxes and push their values (user IDs) to the array
+    checkboxes.forEach((checkbox) => {
+        selectedIds.push(checkbox.value);
+    });
+
+    // Create JSON from the array
+    const selectedData = JSON.stringify({ selectedUsers: selectedIds });
+    console.log('Selected Users:', selectedData);
+
     if (typeof window.ethereum !== 'undefined') {
-      console.log("file1:", file1);
-      console.log("file2:", file2);
-      
+      const ethereum = window.ethereum;
       try {
-        const chainId = await ethereum.request({ method: 'eth_chainId' });
-            if (chainId !== '0x66eee') {
-                alert(config.messages.connectToMainnet);
-                resetButton(button);
-                return;
-            }
-            //const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-            const provider = new ethers.BrowserProvider(ethereum);
-            const signer = await provider.getSigner();
-            const userAddress = await signer.getAddress();
-            const nonceResponse = await fetch(`${dirurl}/getnonce.php?userAddress=${encodeURIComponent(userAddress)}`);
-            if (!nonceResponse.ok) {
-                throw new Error('Failed to fetch nonce');
-            }
-            const nonceData = await nonceResponse.json();
-            const nonce = nonceData.nonce;
-            const fullMessage = createSiweMessage(userAddress, nonce);
-            const signature = await signer.signMessage(fullMessage);
-            await login(nonce, userAddress, fullMessage, signature);
-            const schemaCourse = await getSchema('course');                                 
-            const schemaOrganization = await getOrganization(profileid);                     
-            console.log('SchemaOrganization:', schemaOrganization);
-            const dataCertify = await fetch(`${dirurl}/getdata.php?courseid=${encodeURIComponent(courseId)}`);
-            console.log('datacertify:', dataCertify);
-            const dataCerti = await dataCertify.json();
-            const dataAttestation = createAttestationStudent(schemaCourse, dataCerti, schemaOrganization);
-            console.log('DataAttestation:', dataAttestation);
-            const info = await delegateSignAttestation(
-              dataAttestation,
-              {
-                chain: EvmChains.arbitrumSepolia,
-              }
-            )
-            console.log('Info:', info);
-            const urlatest = url+'/attestations/attestCourseInDelegationMode';
-            const token = JSON.parse(Cookies.get(cookieNameToken));
-            console.log('token:', token);
-            const resfile = await fetch(file1);
-            const blob = await resfile.blob();
-            const filebadge = new File([blob], 'badge.jpeg', { type: blob.type });
-            const resfile2 = await fetch(file2);
-            const blob2 = await resfile2.blob();
-            const certificateFile = new File([blob2], 'certificate.jpeg', { type: blob.type });
-            console.log('Badge: ', file1);
-            console.log('Certificate: ', file2);
-            //crear formData
-            const formCourseDto = new FormData();
-            formCourseDto.append('badge', filebadge);
-            formCourseDto.append('certificate', certificateFile);
-            formCourseDto.append('name', dataCerti.seals[0].name);
-            formCourseDto.append('description', dataCerti.seals[0].description);
-            formCourseDto.append('participants', JSON.stringify(dataCerti.names));
-            formCourseDto.append('wallets', JSON.stringify(dataCerti.wallets));
-            
-            const formAttestationCourseDto = new FormData();
-            formAttestationCourseDto.append('attestationDto', JSON.stringify(info.attestation));    
-            formAttestationCourseDto.append('signatureDto', JSON.stringify(info.delegationSignature));      
-            formAttestationCourseDto.append('profileIdDto', profileid); 
-            formCourseDto.forEach((value, key) => {formAttestationCourseDto.append(key, value)});
-            for (let [key, value] of formAttestationCourseDto.entries()) {
-              console.log(key, value);
-            }
-            try { 
-              const response = await axios.post(urlatest, formAttestationCourseDto, {
-                headers: {
-                  'ngrok-skip-browser-warning': 'true',
-                  'Authorization': `Bearer ${token.accessToken}`,
-                  'Content-Type': 'multipart/form-data',
-                }
-              });
-              console.log('responde attestation: ', response.data);
-              await sendResponseToView(response.data, dataCerti.ids, courseId);
-              updateView();
-              
-            } catch (error) {
-              console.error('Error sending attestation:', error.response ? error.response.data : error.message);
-            }
-        } catch (error) {
-            console.error('Error during MetaMask interaction:', error);
-            resetButton(button);
+        const provider = new ethers.BrowserProvider(ethereum);
+        const signer = await provider.getSigner();
+        const userAddress = await signer.getAddress();
+        const network = await provider.getNetwork();
+        const chainId = network.chainId;  // Chain ID (e.g., 1 for Ethereum Mainnet, 42161 for Arbitrum One, etc.)
+        const networkName = network.name;
+        if (BigInt(var_chain) !== chainId) {
+          alert(config.messages.connectToMainnet);
+          resetButton(button);
+          return;
         }
+
+        const nonceResponse = await fetch(`${dirurl}/getnonce.php?userAddress=${encodeURIComponent(userAddress)}`);
+        if (!nonceResponse.ok) {
+            throw new Error('Failed to fetch nonce');
+        }
+        const nonceData = await nonceResponse.json();
+        const nonce = nonceData.nonce;
+        const fullMessage = createSiweMessage(userAddress, nonce);
+        const signature = await signer.signMessage(fullMessage);
+        await login(nonce, userAddress, fullMessage, signature);
+        const schemaCourse = await getSchema('course');                                                   
+        const dataCertify = await fetch(`${dirurl}/getdata.php?courseid=${encodeURIComponent(courseId)}`, {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json' // Specify the content type as JSON
+          },
+          body: selectedData// Send the JSON object in the request body
+        });
+        console.log('datacertify:', dataCertify);
+        const dataCerti = await dataCertify.json();
+        const dataAttestation = createAttestationStudent(schemaCourse, dataCerti);
+        console.log('DataAttestation:', dataAttestation);
+        const info = await delegateSignAttestation(
+          dataAttestation,
+          {
+            chain: evmchain,
+          }
+        )
+        console.log('EvmChain Arbitrum: ', EvmChains.arbitrum);
+        console.log('EvmChain base sepolia: ', EvmChains.baseSepolia);
+        console.log('EvmChain Base', EvmChains.base);
+        console.log('Info:', info);
+        const urlatest = url+'/attestations/attestCourseInDelegationMode';
+        const token = JSON.parse(Cookies.get(cookieNameToken));
+        console.log('token:', token);
+        const resfile = await fetch(file1);
+        const blob = await resfile.blob();
+        const filebadge = new File([blob], 'badge.jpeg', { type: blob.type });
+        const resfile2 = await fetch(file2);
+        const blob2 = await resfile2.blob();
+        const certificateFile = new File([blob2], 'certificate.jpeg', { type: blob.type });
+        console.log('Badge: ', file1);
+        console.log('Certificate: ', file2);
+        //crear formData
+        const formCourseDto = new FormData();
+        formCourseDto.append('badge', filebadge);
+        formCourseDto.append('certificate', certificateFile);
+        formCourseDto.append('name', dataCerti.seals[0].name);
+        formCourseDto.append('description', dataCerti.seals[0].description);
+        formCourseDto.append('participants', JSON.stringify(dataCerti.names));
+        formCourseDto.append('wallets', JSON.stringify(dataCerti.wallets));
+        
+        const formAttestationCourseDto = new FormData();
+        formAttestationCourseDto.append('attestationDto', JSON.stringify(info.attestation));    
+        formAttestationCourseDto.append('signatureDto', JSON.stringify(info.delegationSignature));      
+        formAttestationCourseDto.append('profileIdDto', profileid); 
+        formCourseDto.forEach((value, key) => {formAttestationCourseDto.append(key, value)});
+        for (let [key, value] of formAttestationCourseDto.entries()) {
+          console.log(key, value);
+        }
+        try { 
+          const response = await axios.post(urlatest, formAttestationCourseDto, {
+            headers: {
+              'ngrok-skip-browser-warning': 'true',
+              'Authorization': `Bearer ${token.accessToken}`,
+              'Content-Type': 'multipart/form-data',
+            }
+          });
+          console.log('responde attestation: ', response.data);
+          await sendResponseToView(response.data, dataCerti.ids, courseId);
+          updateView();
+          
+        } catch (error) {
+          console.error('Error sending attestation:', error.response ? error.response.data : error.message);
+        }
+      } catch (error) {
+          console.error('Error during MetaMask interaction:', error);
+          resetButton(button);
+      }
     } else {
-        alert(config.messages.metamaskNotInstalled);
-        resetButton(button);
+      alert(config.messages.metamaskNotInstalled);
+      resetButton(button);
     }
 }
 
@@ -255,7 +253,7 @@ function updateView() {
   console.log('Updating view');
       setTimeout(() => {
           location.reload(); 
-      }, 30000); 
+      }, 500); 
   }
   
 });

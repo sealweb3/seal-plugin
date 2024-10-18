@@ -15,33 +15,19 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Plugin administration pages are defined here.
+ * Plugin message providers are defined here.
  *
  * @package     mod_cer
- * @category    admin
+ * @category    message
  * @copyright   2024 Pablo Vesga <pablovesga@outlook.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
+$messageproviders = [
 
-$ADMIN->add('modsettings', new admin_category('mod_cer_settings', new lang_string('pluginname', 'mod_cer')));
-$settings = new admin_settingpage('managemod_cer', new lang_string('pluginname', 'mod_cer'));
-
-
-if ($ADMIN->fulltree) {
-    $settings->add(new admin_setting_configcheckbox(
-        'mod_cer/showinnavigation',
-        new lang_string('showinnavigation', 'mod_cer'),
-        new lang_string('showinnavigation_desc', 'mod_cer'),
-        1
-    ));
-    $name = get_string('defaultsettings', 'mod_cer');
-    $description = new lang_string('defaultsettings_help', 'mod_cer');
-    $settings->add(new admin_setting_heading('defaultsettings', $name, $description));
-}
-
-$ADMIN->add('modsettings', $settings);
-
-
+    'Suscripcion' => array(
+        'capability' => 'Se le ha terminado los certificados que venias en su paquete. Por favor, mejore o actualice el paquete actual de certificados'
+    ),
+];

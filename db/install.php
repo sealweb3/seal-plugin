@@ -17,7 +17,7 @@
 /**
  * Code to be executed after the plugin's database scheme has been installed is defined here.
  *
- * @package     mod_seal
+ * @package     mod_cer
  * @category    upgrade
  * @copyright   2024 Pablo Vesga <pablovesga@outlook.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -26,15 +26,27 @@
 /**
  * Custom code to be run on installing the plugin.
  */
-function xmldb_seal_install() {
+function xmldb_cer_install() {
 
     return true;
 }
-set_config('isAuthorized', '', 'mod_seal');
-set_config('name', '', 'mod_seal');
-set_config('description', '', 'mod_seal');
-set_config('website', '', 'mod_seal');
-set_config('profid', '', 'mod_seal');   
-set_config('adressList', '', 'mod_seal'); 
-    
-redirect(new moodle_url('/admin/settings.php', array('section' => 'modsettingseal')));
+
+// Procesar código ingresado
+if (isset($_POST['token'])) {
+    $codigoIngresado = $_POST['token'];
+
+    // Validar el código
+    if (validarCodigo($codigoIngresado)) {
+        // Almacenar el código
+        $codigoValido = $codigoIngresado;
+        guardarCodigo($codigoValido);
+
+        // Continuar con la instalación
+        // ... (código para instalar el plugin)
+    } else {
+        // Mostrar mensaje de error
+        echo '<p class="error">El código ingresado es incorrecto.</p>';
+        // Detener la instalación
+        exit;
+    }
+}

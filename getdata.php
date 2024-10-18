@@ -17,9 +17,14 @@
 require_once(__DIR__.'/../../config.php');
 require_login();
 
+header('Content-Type: application/json; charset=utf-8');
+
 global $DB, $COURSE;
 
 $courseid = required_param('courseid', PARAM_INT);
+
+$rawData = file_get_contents("php://input");
+$data = json_decode($rawData, true);
 
 // Verifica que el usuario tenga permiso para acceder a esta página.
 $context = context_course::instance($courseid);
@@ -28,6 +33,10 @@ require_capability('moodle/course:view', $context);
 // Inicializar arrays para almacenar los datos.
 $wallets = [];
 $seals = [];
+
+foreach ($data as $userId) {
+    // Do something with each user ID
+}
 
 // Consulta para obtener las wallets desde la tabla seal_user.
 $wallets = $DB->get_records_sql("SELECT wallethash, iduser, id FROM {seal_user} WHERE course = ?", [$courseid]);

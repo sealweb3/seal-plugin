@@ -15,17 +15,27 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Plugin version and other meta-data are defined here.
+ * Code to be executed after the plugin's database scheme has been installed is defined here.
  *
- * @package     mod_cer
+ * @package     mod_seal
+ * @category    upgrade
  * @copyright   2024 Pablo Vesga <pablovesga@outlook.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+/**
+ * Custom code to be run on installing the plugin.
+ */
+function xmldb_seal_install() {
 
-$plugin->component = 'mod_cer';
-$plugin->release = '0.1.0';
-$plugin->version = 2024061000;
-$plugin->requires = 2022112800;
-$plugin->maturity = MATURITY_ALPHA;
+    return true;
+}
+set_config('isAuthorized', '', 'mod_seal');
+set_config('name', '', 'mod_seal');
+set_config('description', '', 'mod_seal');
+set_config('website', '', 'mod_seal');
+set_config('profid', '', 'mod_seal');   
+set_config('adressList', '', 'mod_seal'); 
+set_config('program', '', 'mod_seal'); 
+    
+redirect(new moodle_url('/admin/settings.php', array('section' => 'modsettingseal')));

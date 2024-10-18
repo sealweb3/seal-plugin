@@ -3,7 +3,6 @@ require_once('../../../config.php');
 require_login();
 
 $response = new stdClass();
-global $USER, $DB, $COURSE;
 
 try {
     // Capturar datos de la solicitud
@@ -17,27 +16,20 @@ try {
         throw new Exception('Invalid JSON data: ' . json_last_error_msg());
     }
 
-    $atest = isset($data['atest']) ? $data['atest'] : '';
-    $ids = isset($data['ids']) ? $data['ids'] : '';    
-    $courseId = isset($data['courseNow']) ? $data['courseNow'] : '';    
+    // Depuración de los datos recibidos
+    error_log('Received data: ' . print_r($data, true));
 
-    if (empty($atest) || empty($ids)) {
-        throw new Exception('Missing required data');
+    $attestID = isset($data['attestID']) ? $data['attestID'] : null;
+
+    if ($attestID === null) {
+        throw new Exception('Missing authorization data');
     }
 
-    foreach ($ids as $iduser) {
-        $user = $DB->get_record('seal_user', array('id' => $iduser));
-        $user->ipfs = $atest;
-        $user->url = get_config('mod_seal', 'url_student');
-        $DB->update_record('seal_user', $user);
-    }
-
-    /*$seals = $DB->get_record('seal', array('course' => $courseId));
-    $seals->enabled = 0;
-    $DB->update_record('seal', $seals);*/
-
+    set_config('bantest', 0, 'mod_seal');  
+    set_config('program', $attestID['attestation']['id'], 'mod_seal');   
+     
     $response->success = true;
-    $response->id = $id;        
+    $response->message = 'Data processed successfully';
 
 } catch (Exception $e) {
     $response->success = false;
@@ -53,3 +45,4 @@ if (ob_get_contents()) {
 header('Content-Type: application/json');
 echo json_encode($response);
 exit;
+

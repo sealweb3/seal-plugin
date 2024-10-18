@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Display information about all the mod_seal modules in the requested course.
+ * Display information about all the mod_cer modules in the requested course.
  *
- * @package     mod_seal
+ * @package     mod_cer
  * @copyright   2024 Pablo Vesga <pablovesga@outlook.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -33,26 +33,26 @@ require_course_login($course);
 
 $coursecontext = context_course::instance($course->id);
 
-$event = \mod_seal\event\course_module_instance_list_viewed::create(array(
+$event = \mod_cer\event\course_module_instance_list_viewed::create(array(
     'context' => $modulecontext
 ));
 $event->add_record_snapshot('course', $course);
 $event->trigger();
 
-$PAGE->set_url('/mod/seal/index.php', array('id' => $id));
+$PAGE->set_url('/mod/cer/index.php', array('id' => $id));
 $PAGE->set_title(format_string($course->fullname));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($coursecontext);
 
 echo $OUTPUT->header();
 
-$modulenameplural = get_string('modulenameplural', 'mod_seal');
+$modulenameplural = get_string('modulenameplural', 'mod_cer');
 echo $OUTPUT->heading($modulenameplural);
 
-$seals = get_all_instances_in_course('seal', $course);
+$cers = get_all_instances_in_course('cer', $course);
 
-if (empty($seals)) {
-    notice(get_string('no$sealinstances', 'mod_seal'), new moodle_url('/course/view.php', array('id' => $course->id)));
+if (empty($cers)) {
+    notice(get_string('no$cerinstances', 'mod_cer'), new moodle_url('/course/view.php', array('id' => $course->id)));
 }
 
 $table = new html_table();
@@ -69,20 +69,20 @@ if ($course->format == 'weeks') {
     $table->align = array('left', 'left', 'left');
 }
 
-foreach ($seals as $seal) {
-    if (!$seal->visible) {
+foreach ($cers as $cer) {
+    if (!$cer->visible) {
         $link = html_writer::link(
-            new moodle_url('/mod/seal/view.php', array('id' => $seal->coursemodule)),
-            format_string($seal->name, true),
+            new moodle_url('/mod/cer/view.php', array('id' => $cer->coursemodule)),
+            format_string($cer->name, true),
             array('class' => 'dimmed'));
     } else {
         $link = html_writer::link(
-            new moodle_url('/mod/seal/view.php', array('id' => $seal->coursemodule)),
-            format_string($seal->name, true));
+            new moodle_url('/mod/cer/view.php', array('id' => $cer->coursemodule)),
+            format_string($cer->name, true));
     }
 
     if ($course->format == 'weeks' || $course->format == 'topics') {
-        $table->data[] = array($seal->section, $link);
+        $table->data[] = array($cer->section, $link);
     } else {
         $table->data[] = array($link);
     }

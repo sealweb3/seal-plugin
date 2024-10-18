@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
             processing: 'Processing...',
             connectWithMetaMask: 'Connect with MetaMask',
             metamaskNotInstalled: 'MetaMask is not installed. Please consider installing it.',
-            connectToMainnet: 'Please connect to the Arbitrum/Sepolia Mainnet',
+            connectToMainnet: 'Please connect to the '+name_web3,
             requestFailed: 'Request failed!',
             disconnectWallet: 'Disconnect Wallet',
             failedToResetSignature: 'Failed to reset signature',
@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
             statement: 'Seal attestation',
             uri: 'https://sealweb3.com',
             version: '1',
-            chainId: 421614,
+            chainId: var_chain,
             nonce: nonce,
             issuedAt: new Date().toISOString(),
         });
@@ -47,23 +47,26 @@ document.addEventListener('DOMContentLoaded', () => {
         button.textContent = config.messages.processing;
         button.classList.add('disabledButton');
         
-    
         if (typeof window.ethereum !== 'undefined') {
             const ethereum = window.ethereum;
             try {
-                const chainId = await ethereum.request({ method: 'eth_chainId' });
-                if (chainId !== '0x66eee') {
+                const provider = new ethers.BrowserProvider(ethereum);
+                const signer = await provider.getSigner();
+                const userAddress = await signer.getAddress();
+                const network = await provider.getNetwork();
+                const chainId = network.chainId;  // Chain ID (e.g., 1 for Ethereum Mainnet, 42161 for Arbitrum One, etc.)
+                const networkName = network.name;  // Network name (e.g., 'homestead' for Ethereum Mainnet, 'arbitrum' for Arbitrum One, etc.)
+
+
+                if (BigInt(var_chain) !== chainId) {
                     alert(config.messages.connectToMainnet);
                     resetButton(button);
                     return;
                 }
                 // const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-                const provider = new ethers.BrowserProvider(ethereum);
-                const signer = await provider.getSigner();
-                const userAddress = await signer.getAddress();
 
                 // Fetch nonce from the server using GET
-                const nonceResponse = await fetch(`${dirurl}/getnonce.php?userAddress=${encodeURIComponent(userAddress)}`);
+                const nonceResponse = await fetch(`${dirurl}getnonce.php?userAddress=${encodeURIComponent(userAddress)}`);
                 if (!nonceResponse.ok) {
                     throw new Error('Failed to fetch nonce');
                 }
@@ -171,6 +174,6 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('Updating view');
         setTimeout(() => {
             location.reload(); 
-        }, 30000); 
+        }, 500); 
     }
 });
