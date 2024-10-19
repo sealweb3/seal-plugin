@@ -17,15 +17,15 @@
 /**
  * Plugin version and other meta-data are defined here.
  *
- * @package     mod_cer
+ * @package     mod_seal
  * @copyright   2024 Pablo Vesga <pablovesga@outlook.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'mod_cer';
-$plugin->release = '0.1.0';
-$plugin->version = 2024061000;
+$plugin->component = 'mod_seal';
+$plugin->release = '0.1.1';
+$plugin->version = 2024070200;
 $plugin->requires = 2022112800;
 $plugin->maturity = MATURITY_ALPHA;

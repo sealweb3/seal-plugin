@@ -1,4 +1,3 @@
-.gitignore
 node_modules
 node_modules/debug/package.json
 node_modules/debug/README.md
