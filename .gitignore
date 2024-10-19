@@ -1,0 +1,8 @@
+node_modules
+node_modules/debug/package.json
+node_modules/debug/README.md
+.env
+environments.php
+package.json
+package-lock.json
+webpack.config.js
